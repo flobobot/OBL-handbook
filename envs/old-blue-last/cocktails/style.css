@@ -1,0 +1,63 @@
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  padding: 2rem;
+  max-width: 720px;
+  margin: auto;
+}
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+h2 {
+  margin-top: 2rem;
+  color: #333;
+}
+.ingredients {
+  list-style-type: none;
+  padding-left: 0;
+}
+.ingredients li {
+  padding: 0.25rem 0;
+}
+.tag {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.cocktail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.cocktail-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: background 0.2s;
+}
+.cocktail-card:hover {
+  background: #f0f0f0;
+}
+a {
+  text-decoration: none;
+  color: #222;
+  font-weight: bold;
+}
+footer {
+  margin-top: 3rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+footer a {
+  color: #0077cc;
+  text-decoration: none;
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OBL Bartender Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    nav {
+      background-color: #222;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav .nav-left {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    nav .nav-right a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1.5rem;
+    }
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .portal-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      font-size: 1.25rem;
+    }
+    .portal-card a {
+      text-decoration: none;
+      color: #222;
+    }
+    .coming-soon {
+      opacity: 0.5;
+    }
+    .coming-soon-label {
+      font-size: 0.9rem;
+      color: #666;
+      display: block;
+      margin-top: 0.5rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-left">OBL Portal</div>
+    <div class="nav-right">
+      <a href="/training/index.html">Training</a>
+      <a href="/login.html">Login</a>
+      <a href="/admin.html">Admin</a>
+      <a href="#">Milestone: v5</a>
+    </div>
+  </nav>
+
+  <h1 style="text-align: center; margin-top: 2rem;">OBL Bartender Portal</h1>
+
+  <div class="portal-grid">
+    <div class="portal-card">
+      <a href="cocktails/index.html">🍸 Cocktail Handbook</a>
+    </div>
+    <div class="portal-card">
+      <a href="training/index.html">🎯 Training Journey</a>
+    </div>
+    <div class="portal-card coming-soon">
+      🧪 Quizzes<br><span class="coming-soon-label">Coming Soon</span>
+    </div>
+    <div class="portal-card coming-soon">
+      🧾 Pricing Tools<br><span class="coming-soon-label">Coming Soon</span>
+    </div>
+  </div>
+
+  <footer>
+    <p><a href="#">← Back to Site Root</a></p>
+  </footer>
+</body>
+</html>

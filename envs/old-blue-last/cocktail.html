@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cocktail Details</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    nav {
+      background: #1f2937;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .card {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.1rem;
+      color: #666;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      margin: 0.3rem 0 1rem;
+      line-height: 1.5;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 2rem;
+      text-decoration: none;
+      color: #6b46c1;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div style="font-weight: bold; color: white;">OBL Training</div>
+    <div>
+      <a href="/training.html">Training</a>
+      <a href="/login.html">Login</a>
+      <a href="/admin.html">Admin</a>
+      <a href="/milestone.html">Milestone</a>
+    </div>
+  </nav>
+
+  <div class="card" id="cocktailCard">
+    <h1>Loading...</h1>
+    <p><a class="back-link" href="/cocktails/">← Back to Main Page</a></p>
+  </div>
+
+  <script>
+    async function loadCocktail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get("slug");
+      const card = document.getElementById("cocktailCard");
+
+      try {
+        const res = await fetch("/data/cocktail_data_backup.json");
+        const data = await res.json();
+        const cocktail = data.find(item => item.slug === slug);
+
+        if (!cocktail) {
+          card.innerHTML = `<h1>Cocktail not found.</h1><p><a class="back-link" href="/cocktails/">← Back to Main Page</a></p>`;
+          return;
+        }
+
+        card.innerHTML = `
+          <h1>${cocktail.title}</h1>
+          ${cocktail.tag ? `<h2>Category:</h2><p>${cocktail.tag}</p>` : ''}
+          ${cocktail.ingredients?.length ? `<h2>Ingredients:</h2><p>${cocktail.ingredients.join("<br>")}</p>` : ''}
+          ${cocktail.method ? `<h2>Method:</h2><p>${cocktail.method}</p>` : ''}
+          ${cocktail.glassware ? `<h2>Glassware:</h2><p>${cocktail.glassware}</p>` : ''}
+          ${cocktail.garnish ? `<h2>Garnish:</h2><p>${cocktail.garnish}</p>` : ''}
+          ${cocktail.pro_tip ? `<h2>Pro Tip:</h2><p>${cocktail.pro_tip}</p>` : ''}
+          ${cocktail.did_you_know ? `<h2>Did You Know?</h2><p>${cocktail.did_you_know}</p>` : ''}
+          <p><a class="back-link" href="/cocktails/">← Back to Main Page</a></p>
+        `;
+      } catch (err) {
+        card.innerHTML = `<h1>Error loading data.</h1><p><a class="back-link" href="/cocktails/">← Back to Main Page</a></p>`;
+      }
+    }
+
+    loadCocktail();
+  </script>
+</body>
+</html>

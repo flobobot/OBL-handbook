@@ -1,0 +1,27 @@
+# Node/JS
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs and backups
+*.log
+*.bak
+*.zip
+
+# Auth keys and sensitive files
+*.json
+
+# Patch logs and backup scripts
+patches/patch-log.txt
+scripts/backup_and_upload.py

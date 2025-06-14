@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBL Cocktail Handbook</title>
+  <link rel="stylesheet" href="/login-style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f9f9f9;
+    }
+    nav {
+      background: #1e3a8a;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1rem;
+      font-weight: 500;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    .card a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    .card a:hover {
+      text-decoration: underline;
+    }
+    .tag {
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    .Classic { color: #1e3a8a; }
+    .House\\ Riff { color: #d97706; }
+    .Non-Alcoholic { color: #047857; }
+    .Uncategorised { color: #6b7280; }
+    h2 {
+      margin: 2rem 0 1rem;
+      font-size: 1.5rem;
+      color: #111;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div><strong>OBL Handbook</strong></div>
+    <div>
+      <a href="/training.html">Training</a>
+      <a href="/login.html">Login</a>
+      <a href="/admin.html">Admin</a>
+      <span style="margin-left: 1rem; opacity: 0.7;">Milestone: v5</span>
+    </div>
+  </nav>
+
+  <h1 style="text-align:center; margin-top: 2rem;">OBL Cocktail Handbook</h1>
+  <div id="cocktailContainer"></div>
+
+  <div style="text-align: center; margin: 2rem 0;">
+    <a href="/index.html">← Back to Main Portal</a>
+  </div>
+
+  <script>
+    fetch('/data/cocktail_data_backup.json')
+      .then(res => res.json())
+      .then(data => {
+        const grouped = data.reduce((acc, cocktail) => {
+          const tag = cocktail.tag || 'Uncategorised';
+          if (!acc[tag]) acc[tag] = [];
+          acc[tag].push(cocktail);
+          return acc;
+        }, {});
+
+        const container = document.getElementById('cocktailContainer');
+        Object.keys(grouped).forEach(tag => {
+          const section = document.createElement('section');
+          section.innerHTML = `<h2>${tag}</h2>`;
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+
+          grouped[tag].forEach(cocktail => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const slug = encodeURIComponent((cocktail.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+            card.innerHTML = `
+              <a href="/cocktail.html?slug=${slug}">${cocktail.title || 'Untitled'}</a>
+              <div class="tag ${tag.replace(/ /g, '\\ ')}">${tag}</div>
+            `;
+            grid.appendChild(card);
+          });
+
+          section.appendChild(grid);
+          container.appendChild(section);
+        });
+      })
+      .catch(() => {
+        document.getElementById('cocktailContainer').innerHTML = '<p style="color:red;text-align:center;">Failed to load cocktails.</p>';
+      });
+  </script>
+
+</body>
+</html>

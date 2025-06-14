@@ -1,0 +1,52 @@
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  padding: 2rem;
+  text-align: center;
+}
+h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+.portal-grid, .cocktail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.portal-card, .cocktail-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: 0.2s;
+  font-size: 1.2rem;
+}
+.portal-card a, .cocktail-card a {
+  text-decoration: none;
+  color: #222;
+  font-weight: bold;
+}
+.portal-card:hover, .cocktail-card:hover {
+  background: #f0f0f0;
+}
+.coming-soon {
+  color: #aaa;
+}
+.coming-soon-label {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #999;
+}
+footer {
+  margin-top: 3rem;
+  font-size: 0.95rem;
+}
+footer a {
+  color: #0077cc;
+  text-decoration: none;
+}
