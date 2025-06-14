@@ -1,0 +1,38 @@
+name: Deploy Environments
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'envs/**'
+      - 'core-components/**'
+      - 'patches/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: List changed files
+        run: |
+          echo "These files changed:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+
+      - name: (Optional) Run patch engine
+        run: |
+          echo "Patching environments if required..."
+          python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
+
+      - name: (Placeholder) Deploy script
+        run: |
+          echo "Deployment pipeline here. Hook into Netlify CLI or SSH deploy as needed."
