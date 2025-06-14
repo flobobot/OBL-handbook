@@ -25,3 +25,6 @@ Thumbs.db
 # Patch logs and backup scripts
 patches/patch-log.txt
 scripts/backup_and_upload.py
+
+# Local Netlify folder
+.netlify

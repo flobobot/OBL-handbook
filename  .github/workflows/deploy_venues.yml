@@ -1,0 +1,90 @@
+name: Auto Deploy with Filters and Notifications
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'envs/**'
+      - 'core-components/**'
+      - 'patches/**'
+      - 'scripts/deploy_venue.sh'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js and install Netlify CLI
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - run: npm install -g netlify-cli
+
+      - name: Run Pre-Deploy Backup
+        run: python3 scripts/backup_and_upload.py || echo "Backup skipped or failed."
+
+      - name: Detect changed directories and set deploy flags
+        id: detect
+        run: |
+          echo "Detecting changed files..."
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changes.txt
+
+          DEPLOY_OBL=false
+          DEPLOY_AE=false
+
+          if grep -q '^envs/old-blue-last/' changes.txt || grep -q '^core-components/' changes.txt || grep -q '^patches/' changes.txt; then
+            DEPLOY_OBL=true
+          fi
+
+          if grep -q '^envs/adam-and-eve/' changes.txt || grep -q '^core-components/' changes.txt || grep -q '^patches/' changes.txt; then
+            DEPLOY_AE=true
+          fi
+
+          echo "DEPLOY_OBL=$DEPLOY_OBL" >> $GITHUB_ENV
+          echo "DEPLOY_AE=$DEPLOY_AE" >> $GITHUB_ENV
+          echo "Set deploy flags: OBL=$DEPLOY_OBL, A&E=$DEPLOY_AE"
+
+      - name: Run Deployment
+        run: |
+          chmod +x scripts/deploy_venue.sh
+          ./scripts/deploy_venue.sh
+
+      - name: Notify Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ Deploy Success"
+          to: florian.laws@gmail.com
+          from: GitHub CI <${{ secrets.EMAIL_USERNAME }}>
+          body: "Selected environments were deployed successfully."
+
+      - name: Notify Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Deploy Failed: Rollback Started"
+          to: florian.laws@gmail.com
+          from: GitHub CI <${{ secrets.EMAIL_USERNAME }}>
+          body: "Deploy failed. Rollback will now attempt to restore."
+
+      - name: Rollback from Google Drive
+        if: failure()
+        run: python3 scripts/restore_from_drive.py
