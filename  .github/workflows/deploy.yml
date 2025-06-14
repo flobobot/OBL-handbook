@@ -13,6 +13,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -29,9 +30,9 @@ jobs:
 
       - name: (Optional) Run patch engine
         run: |
-          echo "Patching environments if required..."
-          python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
+          echo "Patch step placeholder"
+          echo "Use patches/apply_patch.py here if needed"
 
-      - name: (Placeholder) Deploy script
+      - name: Deploy logic placeholder
         run: |
-          echo "Deployment pipeline here. Hook into Netlify CLI or SSH deploy as needed."
+          echo "Deploy stage here"
