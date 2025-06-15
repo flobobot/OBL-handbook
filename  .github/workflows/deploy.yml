@@ -13,6 +13,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        venue: [old-blue-last, adam-and-eve]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -27,11 +30,20 @@ jobs:
           echo "These files changed:"
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}
 
-      - name: (Optional) Run patch engine
+      - name: Run patch engine
         run: |
           echo "Patching environments if required..."
           python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
 
-      - name: Deploy logic placeholder
+      - name: List environment directories
         run: |
-          echo "Deploy stage here"
+          echo "Environments found:"
+          ls -la envs/
+          echo "Each env folder:"
+          for d in envs/*; do echo "--- $d ---"; ls -la "$d"; done
+
+      - name: Deploy via Netlify CLI
+        working-directory: envs/${{ matrix.venue }}
+        run: |
+          echo "Deploying ${{ matrix.venue }} to Netlify..."
+          netlify deploy --prod --dir=. --site="${{ secrets[format('NETLIFY_SITE_ID_{0}', matrix.venue | upper)] }}"
