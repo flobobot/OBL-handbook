@@ -1,36 +1,37 @@
-name: Deploy Envriommemts
+name: Deploy Environments
+
 on:
- push:
- branches:
-     - main
- paths:
-     - 'envs/**'
-     - 'core-components/**'
-     - 'patches/**'
-     - '.github/workflows/deploy.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'envs/**'
+      - 'core-components/**'
+      - 'patches/**'
+      - '.github/workflows/deploy.yml'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - name: List changed files (safe)
         run: |
           echo "These files changed:"
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+
       - name: (Optional) Run patch engine
         run: |
           echo "Patching environments if required..."
           python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
+
       - name: Deploy logic placeholder
         run: |
           echo "Deploy stage here"
-      - name: Deploy via Netlify CLI
-  working-directory: envs/${{ matrix.venue }}
-  run: |
-    echo "Deploying ${{ matrix.venue }} to Netlify..."
-    netlify deploy --prod --dir=. --site="${{ secrets[format('NETLIFY_SITE_ID_{0}', matrix.venue | upper)] }}"
