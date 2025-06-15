@@ -1,5 +1,4 @@
 name: Deploy Environments
-# Workflow re-added after purge
 
 on:
   push:
