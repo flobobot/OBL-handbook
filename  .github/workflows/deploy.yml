@@ -26,7 +26,6 @@ jobs:
       - name: List changed files (safe)
         run: |
           echo "These files changed:"
-          git rev-parse --is-inside-work-tree || exit 0
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}
 
       - name: (Optional) Run patch engine
@@ -34,6 +33,6 @@ jobs:
           echo "Patching environments if required..."
           python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
 
-      - name: (Placeholder) Deploy script
+      - name: Deploy logic placeholder
         run: |
-          echo "Deployment pipeline here. Hook into Netlify CLI or SSH deploy as needed."
+          echo "Deploy stage here"
