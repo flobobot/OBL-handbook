@@ -1,4 +1,9 @@
-name: Deploy Environments
+\- name: List changed files (safe)
+  run: |
+    echo "These files changed:"
+    git rev-parse --is-inside-work-tree || exit 0
+    git fetch --no-tags --prune --depth=10 origin main
+    git diff --name-only HEAD^ HEAD || echo "No diff available"name: Deploy Environments
 
 on:
   push:
@@ -26,8 +31,9 @@ jobs:
       - name: List changed files (safe)
         run: |
           echo "These files changed:"
-          git rev-parse --is-inside-work-tree || exit 0
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+         git rev-parse --is-inside-work-tree || exit 0
+   	 git fetch --no-tags --prune --depth=10 origin main
+   	 git diff --name-only HEAD^ HEAD || echo "No diff available"
 
       - name: (Optional) Run patch engine
         run: |
