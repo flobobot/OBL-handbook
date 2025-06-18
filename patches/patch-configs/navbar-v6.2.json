@@ -1,0 +1,16 @@
+{
+  "version": "v6.2",
+  "timestamp": "2025-06-18T10:19:26.390115Z",
+  "description": "Navbar v6.2 rollout: fixes visual bugs, injects training tab",
+  "patches": {
+    "navbar.html": {
+      "actions": [
+        {
+          "type": "replace",
+          "target": "<!-- TRAINING_NAV_PLACEHOLDER -->",
+          "replacement": "<a href=\"/training.html\">Training</a>"
+        }
+      ]
+    }
+  }
+}
