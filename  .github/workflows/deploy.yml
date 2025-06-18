@@ -36,6 +36,12 @@ jobs:
         run: |
          echo "Applying patch logic for ${{ matrix.venue }}"
          python3 patches/apply_patch.py "${{ matrix.venue }}" || echo "No patch needed or already applied"
+         
+         - name: Save CI Trace Log
+        run: |
+         mkdir -p scripts/logs/
+         echo "{\"venue\": \"${{ matrix.venue }}\", \"commit\": \"${{ github.sha }}\", \"timestamp\": \"$(date --utc +%Y-%m-%dT%H:%M:%SZ)\"}" \
+         > scripts/logs/${{ matrix.venue }}.json
 
       - name: List environment directories
         run: |
