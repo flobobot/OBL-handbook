@@ -26,10 +26,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: List changed files (safe)
+      - name: List changed files (safe fallback)
         run: |
-          echo "These files changed:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+         echo "These files changed:"
+         git fetch --unshallow || true
+         git diff --name-only origin/main...HEAD || echo "(no diff – likely first push or shallow clone)"
 
       - name: Run patch engine
         run: |
