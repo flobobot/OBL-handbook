@@ -34,8 +34,8 @@ jobs:
 
       - name: Run patch engine
         run: |
-          echo "Patching environments if required..."
-          python3 patches/apply_patch.py || echo "Patch skipped (optional or already patched)"
+         echo "Applying patch logic for ${{ matrix.venue }}"
+         python3 patches/apply_patch.py "${{ matrix.venue }}" || echo "No patch needed or already applied"
 
       - name: List environment directories
         run: |
