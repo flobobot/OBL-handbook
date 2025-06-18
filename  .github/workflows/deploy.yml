@@ -46,6 +46,8 @@ jobs:
 
       - name: Deploy via Netlify CLI
         working-directory: envs/${{ matrix.venue }}
+        env:
+         NETLIFY_SITE_ID: ${{ secrets[format('NETLIFY_SITE_ID_{0}', matrix.venue | upper)] }}
         run: |
-          echo "Deploying ${{ matrix.venue }} to Netlify..."
-          netlify deploy --prod --dir=. --site="${{ secrets[format('NETLIFY_SITE_ID_{0}', matrix.venue | upper)] }}"
+         echo "Deploying ${{ matrix.venue }} to Netlify..."
+         netlify deploy --prod --dir=. --site="$NETLIFY_SITE_ID"
