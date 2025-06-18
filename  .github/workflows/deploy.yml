@@ -30,8 +30,8 @@ jobs:
       - name: List changed files (safe fallback)
         run: |
          echo "These files changed:"
-         git fetch --unshallow || true
-         git diff --name-only origin/main...HEAD || echo "(no diff – likely first push or shallow clone)"
+         git fetch --no-tags --prune --depth=10000 origin main
+         git diff --name-only FETCH_HEAD || echo "(no diff – fallback to FETCH_HEAD used)"
 
       - name: Run patch engine
         run: |
