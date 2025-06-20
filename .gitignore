@@ -1,4 +1,35 @@
-# Node/JS
+# Node + build
+node_modules/
+dist/
+build/
+.env
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# IDE config
+.vscode/
+.idea/
+
+# Netlify cache / build artifacts
+.netlify/
+
+# Optional: ignore general JSON files
+# *.json
+
+# BUT explicitly include the cocktail data file
+!netlify/data/cocktail_data_backup.json
+
+# Git history / lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore all zip/tar backups
+*.zip
+*.tar.gz# Node/JS
 node_modules/
 dist/
 
