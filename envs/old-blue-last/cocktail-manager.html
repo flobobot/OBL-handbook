@@ -6,98 +6,91 @@
   <title>Old Blue Last Cocktail Manager</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background-color: #f6f6f6;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
       padding: 2rem;
-      color: #111;
+      background: #f4f4f4;
     }
-    h1 {
-      font-size: 2rem;
-    }
-    .card {
-      background-color: white;
-      border-radius: 8px;
+
+    nav {
+      background: #222;
+      color: white;
       padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      display: flex;
+      gap: 2rem;
     }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin-top: 2rem;
+      font-size: 1.8rem;
+    }
+
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
     .card h2 {
       margin-top: 0;
     }
-    .card p {
-      margin: 0.25rem 0;
+
+    .error {
+      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Old Blue Last Cocktail Manager</h1>
-  <div id="cocktail-list"></div>
-  <script>
-    const data = [
-      {
-        "title": "Abby Martini",
-        "ingredients": "50ml vodka, 25ml lychee liqueur, 10ml lemon juice",
-        "glassware": "Martini",
-        "method": "Shake and fine strain",
-        "pro_tip": "Chill glassware for extra elegance.",
-        "category": "House Riff"
-      },
-      {
-        "title": "Paloma",
-        "ingredients": "50ml tequila, 100ml grapefruit soda, 10ml lime juice",
-        "glassware": "Highball",
-        "method": "Build over ice",
-        "pro_tip": "Use fresh grapefruit where possible.",
-        "category": "Classic"
-      },
-      {
-        "title": "Disco Sour",
-        "ingredients": "El Gobernador (apricot infused): 40ml, Lemon Juice: 20ml, Velvet Falernum: 20ml, Benedictine: 10ml, Egg White: 25ml, Sugar Syrup: 5ml, Orange Bitters: 1 dash",
-        "glassware": "Coupette",
-        "method": "Dry shake, then wet shake. Fine strain into a coupette.",
-        "pro_tip": "The blend of Falernum, Benedictine and apricot-infused pisco gives this a velvety body and tropical funk. Use with confidence once staff reach Level 3.",
-        "category": "Neo Classic"
-      },
-      {
-        "title": "Tequila Paloma",
-        "ingredients": "Cazcabel Reposado: 50ml, Lime: 20ml, Agave: 5ml, Grapefruit: 40ml, Pomelo Pink & Pepper Tonic or soda: 60ml",
-        "glassware": "Highball",
-        "method": "Build in a highball with ice, stir, and top with tonic or soda.",
-        "pro_tip": "Add a pinch of salt to highlight the peppery reposado and citrus.",
-        "category": "House Riff"
-      },
-      {
-        "title": "Royal Kir",
-        "ingredients": "Prosecco: 125ml, Hayman’s Sloe Gin: 25ml",
-        "glassware": "Flute",
-        "method": "Build in a flute. Add sloe gin first, then top with chilled prosecco.",
-        "pro_tip": "Pour prosecco slowly down the inside of the flute to preserve bubbles.",
-        "category": "Classic"
-      },
-      {
-        "title": "Sundance",
-        "ingredients": "Havana 3yo Rum: 30ml, Bulleit Rye: 20ml, Dolin Sweet Vermouth (red): 20ml, Cynar: 5ml, Frangelico: 10ml, Orange Bitters: 1 dash",
-        "glassware": "Nick & Nora",
-        "method": "Stir with ice and strain into a rocks glass over fresh ice.",
-        "pro_tip": "Balancing rye spice, rum warmth, and bitter liqueurs — a riff on the Connaught’s Everglow.",
-        "category": "Uncategorised"
-      }
-    ];
+  <nav>
+    <a href="/cocktail-manager.html">Cocktails</a>
+    <a href="/training.html">Training</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/login.html">Login</a>
+  </nav>
 
-    const list = document.getElementById("cocktail-list");
-    data.forEach(drink => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <h2>${drink.title}</h2>
-        <p><strong>Ingredients:</strong> ${drink.ingredients}</p>
-        <p><strong>Glassware:</strong> ${drink.glassware}</p>
-        <p><strong>Method:</strong> ${drink.method}</p>
-        <p><strong>Pro Tip:</strong> ${drink.pro_tip}</p>
-        <p><strong>Category:</strong> ${drink.category}</p>
-      `;
-      list.appendChild(div);
-    });
+  <h1>Old Blue Last Cocktail Manager</h1>
+  <div id="cocktailList">Loading...</div>
+
+  <script>
+    async function loadCocktails() {
+      const container = document.getElementById("cocktailList");
+      try {
+        const res = await fetch("/netlify/data/cocktail_data_backup.json");
+        const data = await res.json();
+        const cocktails = Array.isArray(data) ? data : [];
+
+        if (cocktails.length === 0) {
+          container.innerHTML = '<p class="error">No cocktail data found.</p>';
+          return;
+        }
+
+        container.innerHTML = cocktails.map(c => `
+          <div class="card">
+            <h2>${c.title || "Untitled Cocktail"}</h2>
+            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(', ') : c.ingredients || "N/A"}</p>
+            <p><strong>Glassware:</strong> ${c.glassware || "N/A"}</p>
+            <p><strong>Method:</strong> ${c.method || "N/A"}</p>
+            <p><strong>Pro Tip:</strong> ${c.pro_tip || "N/A"}</p>
+            <p><strong>Did You Know:</strong> ${c.did_you_know || "N/A"}</p>
+            <p><strong>Category:</strong> ${c.tag || "Uncategorised"}</p>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error("Load error:", err);
+        container.innerHTML = `<p class="error">Failed to load cocktail data. Please check the Drive link or format.</p>`;
+      }
+    }
+
+    loadCocktails();
   </script>
 </body>
 </html>
