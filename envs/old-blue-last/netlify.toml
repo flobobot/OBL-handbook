@@ -1,6 +1,6 @@
 [build]
   publish = "envs/old-blue-last"
-  functions = "netlify/functions"
+  functions = "envs/old-blue-last/netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
