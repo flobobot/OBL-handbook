@@ -16,9 +16,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-     matrix:
-      venue: [old-blue-last, adam-and-eve]
+     strategy:
+       matrix:
+       venue: [old-blue-last, adam-and-eve]
 
     steps:
       - name: Debug GitHub workspace
