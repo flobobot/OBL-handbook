@@ -2,119 +2,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edit Cocktail</title>
   <style>
     body {
       font-family: sans-serif;
-      padding: 2rem;
+      margin: 2rem;
       max-width: 700px;
-      margin: auto;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
     }
     input, textarea {
       width: 100%;
-      margin-bottom: 1rem;
       padding: 0.5rem;
-      font-size: 1rem;
+      margin-top: 0.25rem;
     }
     button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
+      margin-top: 1.5rem;
+      padding: 0.75rem 1rem;
       background: black;
       color: white;
       border: none;
+      font-size: 1rem;
       cursor: pointer;
-    }
-    .label {
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>Edit Cocktail</h1>
-  <form id="editor-form">
-    <div class="label">Title</div>
-    <input type="text" id="title" required />
+  <form id="cocktailForm">
+    <label>Title</label>
+    <input type="text" name="title" required />
 
-    <div class="label">Ingredients</div>
-    <textarea id="ingredients" rows="4"></textarea>
+    <label>Ingredients</label>
+    <textarea name="ingredients" rows="3"></textarea>
 
-    <div class="label">Glassware</div>
-    <input type="text" id="glassware" />
+    <label>Glassware</label>
+    <input type="text" name="glassware" />
 
-    <div class="label">Method</div>
-    <textarea id="method" rows="3"></textarea>
+    <label>Method</label>
+    <textarea name="method" rows="3"></textarea>
 
-    <div class="label">Pro Tip</div>
-    <input type="text" id="pro_tip" />
+    <label>Pro Tip</label>
+    <input type="text" name="pro_tip" />
 
-    <div class="label">Did You Know</div>
-    <input type="text" id="did_you_know" />
+    <label>Did You Know</label>
+    <input type="text" name="did_you_know" />
 
     <button type="submit">Save Cocktail</button>
   </form>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
-
-    const form = document.getElementById('editor-form');
-    const fields = ['title', 'ingredients', 'glassware', 'method', 'pro_tip', 'did_you_know'];
+    const form = document.getElementById("cocktailForm");
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("slug");
 
     async function loadCocktails() {
-      const res = await fetch('/.netlify/functions/load-cocktail-data');
+      const res = await fetch("/.netlify/functions/load-cocktail-data");
       const data = await res.json();
       return JSON.parse(data.body);
     }
 
-    function slugify(title) {
-      return title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
-    }
-
     function populateForm(cocktail) {
-      fields.forEach(field => {
-        document.getElementById(field).value = cocktail[field] || '';
-      });
+      if (!cocktail) return;
+      form.title.value = cocktail.title || "";
+      form.ingredients.value = cocktail.ingredients || "";
+      form.glassware.value = cocktail.glassware || "";
+      form.method.value = cocktail.method || "";
+      form.pro_tip.value = cocktail.pro_tip || "";
+      form.did_you_know.value = cocktail.did_you_know || "";
     }
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const updated = {};
-      fields.forEach(field => {
-        updated[field] = document.getElementById(field).value.trim();
-      });
-      updated.slug = slugify(updated.title);
-      updated.filename = `${updated.slug}.md`;  // required field
-      updated.tag = 'Classic'; // or any default value
-      updated.city = 'London'; // optional
-      updated.image = ''; // optional
-
-      const cocktails = await loadCocktails();
-      const index = cocktails.findIndex(c => c.slug === slug);
-      if (index >= 0) {
-        cocktails[index] = updated;
-      } else {
-        cocktails.push(updated);
-      }
-
-      const saveRes = await fetch('/.netlify/functions/save-cocktail-drive', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cocktails),
-      });
-
-      if (saveRes.ok) {
-        alert('Saved!');
-        window.location.href = '/cocktail-manager.html';
-      } else {
-        alert('Failed to save cocktail.');
-      }
+    loadCocktails().then(cocktails => {
+      const selected = cocktails.find(c => c.slug === slug);
+      populateForm(selected);
     });
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      const cocktails = await loadCocktails();
-      const cocktail = cocktails.find(c => c.slug === slug);
-      if (cocktail) populateForm(cocktail);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const cocktail = {
+        slug,
+        title: formData.get("title"),
+        ingredients: formData.get("ingredients"),
+        glassware: formData.get("glassware"),
+        method: formData.get("method"),
+        pro_tip: formData.get("pro_tip"),
+        did_you_know: formData.get("did_you_know")
+      };
+
+      await fetch("/.netlify/functions/save-cocktail-drive", {
+        method: "POST",
+        body: JSON.stringify(cocktail)
+      });
+
+      alert("Cocktail saved!");
+      window.location.href = "/cocktail-manager.html";
     });
   </script>
 </body>
