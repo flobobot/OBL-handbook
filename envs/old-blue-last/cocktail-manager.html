@@ -2,104 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cocktail Manager</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #fafafa;
+      font-family: sans-serif;
+      margin: 2rem;
+      background: #f4f4f4;
+      color: #222;
     }
-    nav {
-      background: #fff;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ccc;
-    }
-    nav a {
-      margin-right: 20px;
-      font-weight: bold;
-      text-decoration: none;
-      color: black;
-    }
-    h1 {
-      font-size: 28px;
+    header {
+      margin-bottom: 1rem;
     }
     .card {
-      border: 1px solid #ddd;
       background: white;
-      padding: 16px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-    .card h3 {
-      margin-top: 0;
+    .card h2 {
+      margin: 0;
+      font-size: 1.5rem;
     }
-    .category {
-      margin-top: 40px;
-    }
-    .category h2 {
-      border-bottom: 2px solid #333;
+    .card p {
+      margin: 0.25rem 0;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Old Blue Last Cocktail Manager</h1>
+  </header>
 
-<nav>
-  <a href="/cocktail-manager.html">Cocktails</a>
-  <a href="/training.html">Training</a>
-  <a href="/admin.html">Admin</a>
-  <a href="/login.html">Login</a>
-</nav>
+  <div id="cocktail-list">
+    Loading cocktails...
+  </div>
 
-<h1>Cocktail Card Manager</h1>
-<div id="content">Loading...</div>
+  <script>
+    // Embedded static JSON backup
+    const cocktails = [
+      {
+        "name": "Abby Martini",
+        "ingredients": ["50ml vodka", "25ml lychee liqueur", "10ml lemon juice"],
+        "glassware": "Martini",
+        "method": "Shake and fine strain",
+        "proTip": "Chill glassware for extra elegance.",
+        "category": "House Riff"
+      },
+      {
+        "name": "Paloma",
+        "ingredients": ["50ml tequila", "100ml grapefruit soda", "10ml lime juice"],
+        "glassware": "Highball",
+        "method": "Build over ice",
+        "proTip": "Use fresh grapefruit where possible.",
+        "category": "Classic"
+      }
+    ]; // <-- Replace with full array from your cocktail_data_backup.json
 
-<script>
-  async function loadCocktails() {
-    try {
-      const response = await fetch('/assets/cocktail_data_backup.json');      
-      const data = await response.json();
-      renderCocktails(data);
-    } catch (err) {
-      document.getElementById('content').innerHTML = "<p style='color:red;'>Failed to load cocktail data. Please check the file path or format.</p>";
-      console.error(err);
-    }
-  }
-
-  function renderCocktails(cocktails) {
-    const grouped = {};
-    cocktails.forEach(cocktail => {
-      const tag = (cocktail.tag || 'Uncategorised').trim();
-      if (!grouped[tag]) grouped[tag] = [];
-      grouped[tag].push(cocktail);
-    });
-
-    const content = document.getElementById('content');
-    content.innerHTML = '';
-
-    Object.keys(grouped).sort().forEach(tag => {
-      const section = document.createElement('div');
-      section.className = 'category';
-      section.innerHTML = `<h2>${tag}</h2>`;
-      grouped[tag].forEach(cocktail => {
-        section.innerHTML += `
-          <div class="card">
-            <h3>${cocktail.title}</h3>
-            <p><strong>Ingredients:</strong> ${Array.isArray(cocktail.ingredients) ? cocktail.ingredients.join(', ') : cocktail.ingredients}</p>
-            <p><strong>Glassware:</strong> ${cocktail.glassware || '—'}</p>
-            <p><strong>Method:</strong> ${cocktail.method || '—'}</p>
-            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || '—'}</p>
-            <p><strong>Did You Know:</strong> ${cocktail.did_you_know || '—'}</p>
-          </div>
+    function renderCocktails() {
+      const container = document.getElementById('cocktail-list');
+      container.innerHTML = '';
+      cocktails.forEach(drink => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2>${drink.name}</h2>
+          <p><strong>Ingredients:</strong> ${drink.ingredients?.join(', ') || 'N/A'}</p>
+          <p><strong>Glassware:</strong> ${drink.glassware || 'N/A'}</p>
+          <p><strong>Method:</strong> ${drink.method || 'N/A'}</p>
+          <p><strong>Pro Tip:</strong> ${drink.proTip || '—'}</p>
+          <p><strong>Category:</strong> ${drink.category || 'Uncategorised'}</p>
         `;
+        container.appendChild(card);
       });
-      content.appendChild(section);
-    });
-  }
+    }
 
-  loadCocktails();
-</script>
-
+    window.onload = renderCocktails;
+  </script>
 </body>
 </html>
