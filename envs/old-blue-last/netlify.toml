@@ -1,20 +1,21 @@
 [build]
-publish = "."
-
-[[redirects]]
-from = "/cocktails/*"
-to = "/cocktails/index.html"
-status = 200
-
-[[redirects]]
-from = "/cocktail.html"
-to = "/cocktail.html"
-status = 200
-
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  publish = "envs/old-blue-last"
+  functions = "netlify/functions"
 
 [functions]
-directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/cocktails/*"
+  to = "/cocktails/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cocktail.html"
+  to = "/cocktail.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
