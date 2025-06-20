@@ -9,42 +9,35 @@
       margin: 0;
       padding: 2rem;
     }
-
     nav {
       background: #f5f5f5;
       padding: 1rem 2rem;
       margin: -2rem -2rem 2rem -2rem;
     }
-
     nav a {
       margin-right: 1.5rem;
       text-decoration: none;
       font-weight: bold;
       color: #000;
     }
-
     h1 {
       font-size: 2rem;
       margin-bottom: 1rem;
     }
-
     .controls {
       display: flex;
       gap: 1rem;
       margin-bottom: 1rem;
     }
-
     input[type="text"] {
       padding: 0.5rem;
       font-size: 1rem;
       width: 200px;
     }
-
     select {
       padding: 0.5rem;
       font-size: 1rem;
     }
-
     .card {
       border: 1px solid #ccc;
       padding: 1rem;
@@ -52,7 +45,6 @@
       margin-bottom: 1rem;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-
     .edit-btn {
       margin-top: 0.5rem;
       background: #007bff;
@@ -62,7 +54,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     .edit-btn:hover {
       background-color: #0056b3;
     }
@@ -98,10 +89,14 @@
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
         const data = await res.json();
-        cocktails = JSON.parse(data.body);
+
+        // Validate shape
+        if (!Array.isArray(data)) throw new Error("Invalid cocktail data array");
+
+        cocktails = data;
         renderCards();
       } catch (err) {
-        console.error(err);
+        console.error("Error loading cocktail data:", err);
         cardsDiv.innerHTML = "<p>Error loading cocktails.</p>";
       }
     }
@@ -132,12 +127,12 @@
 
       cardsDiv.innerHTML = filtered.map(cocktail => `
         <div class="card">
-          <h3>${cocktail.title}</h3>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
-          <p><strong>Method:</strong> ${cocktail.method}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
+          <h3>${cocktail.title || "Untitled Cocktail"}</h3>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients || "-"}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware || "-"}</p>
+          <p><strong>Method:</strong> ${cocktail.method || "-"}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</p>
           <button class="edit-btn" onclick="editCocktail('${cocktail.slug}')">Edit</button>
         </div>
       `).join('');
