@@ -58,59 +58,68 @@
     <button type="submit">Save Cocktail</button>
   </form>
 
-<script>
-  const form = document.getElementById("cocktailForm");
-  const params = new URLSearchParams(window.location.search);
-  const slug = params.get("slug");
+  <script>
+    const form = document.getElementById("cocktailForm");
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("slug");
 
-  async function loadCocktails() {
-    const res = await fetch("/.netlify/functions/load-cocktail-data");
-    const data = await res.json();
-    return JSON.parse(data.body);
-  }
-
-  function populateForm(cocktail) {
-    if (!cocktail) {
-      alert("Cocktail not found.");
-      return;
+    async function loadCocktails() {
+      const res = await fetch("/.netlify/functions/load-cocktail-data");
+      const text = await res.text();
+      try {
+        const parsed = JSON.parse(text);
+        return parsed;
+      } catch (err) {
+        console.error("Failed to parse cocktail data:", err.message, text);
+        return [];
+      }
     }
-    form.title.value = cocktail.title || "";
-    form.ingredients.value = cocktail.ingredients || "";
-    form.glassware.value = cocktail.glassware || "";
-    form.method.value = cocktail.method || "";
-    form.pro_tip.value = cocktail.pro_tip || "";
-    form.did_you_know.value = cocktail.did_you_know || "";
-  }
 
-  loadCocktails().then(cocktails => {
-    let selected = cocktails.find(c => c.slug === slug);
-    if (!selected) {
-      selected = cocktails.find(c => slug && c.title.toLowerCase().replace(/\s+/g, "-") === slug);
+    function populateForm(cocktail) {
+      if (!cocktail) {
+        alert("Cocktail not found.");
+        return;
+      }
+      form.title.value = cocktail.title || "";
+      form.ingredients.value = cocktail.ingredients || "";
+      form.glassware.value = cocktail.glassware || "";
+      form.method.value = cocktail.method || "";
+      form.pro_tip.value = cocktail.pro_tip || "";
+      form.did_you_know.value = cocktail.did_you_know || "";
     }
-    populateForm(selected);
-  });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const cocktail = {
-      slug,
-      title: formData.get("title"),
-      ingredients: formData.get("ingredients"),
-      glassware: formData.get("glassware"),
-      method: formData.get("method"),
-      pro_tip: formData.get("pro_tip"),
-      did_you_know: formData.get("did_you_know")
-    };
-
-    await fetch("/.netlify/functions/save-cocktail-drive", {
-      method: "POST",
-      body: JSON.stringify(cocktail)
+    loadCocktails().then(cocktails => {
+      let selected = cocktails.find(c => c.slug === slug);
+      if (!selected && slug) {
+        selected = cocktails.find(c => c.title.toLowerCase().replace(/\s+/g, "-") === slug);
+      }
+      populateForm(selected);
     });
 
-    alert("Cocktail saved!");
-    window.location.href = "/cocktail-manager.html";
-  });
-</script>
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const cocktail = {
+        slug,
+        title: formData.get("title"),
+        ingredients: formData.get("ingredients"),
+        glassware: formData.get("glassware"),
+        method: formData.get("method"),
+        pro_tip: formData.get("pro_tip"),
+        did_you_know: formData.get("did_you_know")
+      };
+
+      await fetch("/.netlify/functions/save-cocktail-drive", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(cocktail)
+      });
+
+      alert("Cocktail saved!");
+      window.location.href = "/cocktail-manager.html";
+    });
+  </script>
 </body>
 </html>
