@@ -2,69 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocktail Card Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Cocktail</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 2rem;
+      max-width: 700px;
+      margin: auto;
     }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    input, textarea {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
     }
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-    .card-btn {
-      margin-top: 1rem;
-    }
-    .edit-button {
-      display: inline-block;
-      padding: 0.4rem 1rem;
-      background: #0077cc;
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background: black;
       color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+    }
+    .label {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Cocktail Card Manager</h1>
-  <div id="card-list"></div>
+  <h1>Edit Cocktail</h1>
+  <form id="editor-form">
+    <div class="label">Title</div>
+    <input type="text" id="title" required />
+
+    <div class="label">Ingredients</div>
+    <textarea id="ingredients" rows="4"></textarea>
+
+    <div class="label">Glassware</div>
+    <input type="text" id="glassware" />
+
+    <div class="label">Method</div>
+    <textarea id="method" rows="3"></textarea>
+
+    <div class="label">Pro Tip</div>
+    <input type="text" id="pro_tip" />
+
+    <div class="label">Did You Know</div>
+    <input type="text" id="did_you_know" />
+
+    <button type="submit">Save Cocktail</button>
+  </form>
 
   <script>
-    async function loadCocktails() {
-      const response = await fetch('/.netlify/functions/load-cocktail-data');
-      const cocktails = await response.json();
-      const container = document.getElementById('card-list');
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
 
-      cocktails.forEach(cocktail => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-          <div class="card-title">${cocktail.title}</div>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
-          <p><strong>Method:</strong> ${cocktail.method}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
-          <div class="card-btn">
-            <a class="edit-button" href="/cocktail-editor.html?slug=${encodeURIComponent(cocktail.slug)}">Edit</a>
-          </div>
-        `;
-        container.appendChild(div);
+    const form = document.getElementById('editor-form');
+    const fields = ['title', 'ingredients', 'glassware', 'method', 'pro_tip', 'did_you_know'];
+
+    async function loadCocktails() {
+      const res = await fetch('/.netlify/functions/load-cocktail-data');
+      const data = await res.json();
+      return JSON.parse(data.body);
+    }
+
+    function slugify(title) {
+      return title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    }
+
+    function populateForm(cocktail) {
+      fields.forEach(field => {
+        document.getElementById(field).value = cocktail[field] || '';
       });
     }
 
-    loadCocktails();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updated = {};
+      fields.forEach(field => {
+        updated[field] = document.getElementById(field).value.trim();
+      });
+      updated.slug = slugify(updated.title);
+      updated.filename = `${updated.slug}.md`;  // required field
+      updated.tag = 'Classic'; // or any default value
+      updated.city = 'London'; // optional
+      updated.image = ''; // optional
+
+      const cocktails = await loadCocktails();
+      const index = cocktails.findIndex(c => c.slug === slug);
+      if (index >= 0) {
+        cocktails[index] = updated;
+      } else {
+        cocktails.push(updated);
+      }
+
+      const saveRes = await fetch('/.netlify/functions/save-cocktail-drive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cocktails),
+      });
+
+      if (saveRes.ok) {
+        alert('Saved!');
+        window.location.href = '/cocktail-manager.html';
+      } else {
+        alert('Failed to save cocktail.');
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const cocktails = await loadCocktails();
+      const cocktail = cocktails.find(c => c.slug === slug);
+      if (cocktail) populateForm(cocktail);
+    });
   </script>
 </body>
 </html>
