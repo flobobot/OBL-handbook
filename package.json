@@ -1,0 +1,10 @@
+{
+  "name": "obl-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for OBL",
+  "main": "save-cocktail-data.js",
+  "type": "module",
+  "dependencies": {
+    "googleapis": "^118.0.0"
+  }
+}
