@@ -1,91 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
   <title>Cocktail Card Manager</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f9f9f9;
-      margin: 2rem;
-    }
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    .card h2 {
-      margin-top: 0;
-    }
-    .edit-btn {
-      background: #007aff;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-    .edit-btn:hover {
-      background: #0051c2;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
+    body { font-family: sans-serif; padding: 2em; background: #f9f9f9; }
+    nav { background: white; padding: 1em; margin-bottom: 1em; border-bottom: 1px solid #ccc; }
+    nav a { margin-right: 1.5em; font-weight: bold; color: #333; text-decoration: none; }
+    h1 { font-size: 2em; }
+    .card { background: white; border: 1px solid #ddd; padding: 1em; margin: 1em 0; border-radius: 10px; }
+    .card h2 { margin: 0; }
+    .controls { display: flex; gap: 1em; margin: 1em 0; }
+    input[type="text"] { padding: 0.5em; width: 250px; }
+    select { padding: 0.5em; }
+    .error { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="/cocktail-manager.html">Cocktails</a>
+    <a href="/training.html">Training</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/login.html">Login</a>
+  </nav>
+
   <h1>Cocktail Card Manager</h1>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search cocktails...">
+    <select id="sort">
+      <option value="asc">Sort: A–Z</option>
+      <option value="desc">Sort: Z–A</option>
+    </select>
+  </div>
   <div id="cards">Loading...</div>
-  <div id="error" class="error"></div>
+
+  <script id="cocktail-data" type="application/json">
+  [
+    {
+      "title": "Disco Sour",
+      "ingredients": [
+        "El Gobernador (apricot infused): 40ml",
+        "Lemon Juice: 20ml",
+        "Velvet Falernum: 20ml",
+        "Benedictine: 10ml",
+        "Egg White: 25ml",
+        "Sugar Syrup: 5ml",
+        "Orange Bitters: 1 dash"
+      ],
+      "glassware": "Coupette",
+      "method": "Dry shake, then wet shake. Fine strain into a coupette.",
+      "pro_tip": "The blend of Falernum, Benedictine and apricot-infused pisco gives this a velvety body and tropical funk.",
+      "did_you_know": "This is a neo-classic — not found in century-old books but gaining popularity in high-end bars with creative menus.",
+      "slug": "disco-sour",
+      "category": "House Riff"
+    }
+    // You can extend this manually or regenerate from live JSON.
+  ]
+  </script>
 
   <script>
-    async function loadCocktails() {
-      const container = document.getElementById("cards");
-      const errorBox = document.getElementById("error");
+    const cocktailData = JSON.parse(document.getElementById('cocktail-data').textContent);
+    const container = document.getElementById("cards");
+    const searchInput = document.getElementById("search");
+    const sortSelect = document.getElementById("sort");
 
-      try {
-        const res = await fetch("/.netlify/functions/load-cocktail-data");
-        const data = await res.json();
-
-        if (!data || !data.body) throw new Error("No data.body returned");
-        
-        let cocktails = JSON.parse(data.body);
-        if (!Array.isArray(cocktails)) throw new Error("Cocktail data is not an array");
-
-        container.innerHTML = "";
-        cocktails.forEach((cocktail) => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <h2>${cocktail.title}</h2>
-            <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
-            <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
-            <p><strong>Method:</strong> ${cocktail.method}</p>
-            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
-            <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
-            <button class="edit-btn" onclick="editCocktail('${cocktail.slug}')">Edit</button>
-          `;
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        console.error("Load error:", err.message);
-        container.innerHTML = "";
-        errorBox.textContent = "Error loading cocktail data. Check server logs or Drive file format.";
+    function renderCards(data) {
+      container.innerHTML = '';
+      if (!data.length) {
+        container.innerHTML = "<p>No cocktails match your search.</p>";
+        return;
       }
+      data.forEach(drink => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h2>${drink.title}</h2>
+          <p><strong>Ingredients:</strong> ${Array.isArray(drink.ingredients) ? drink.ingredients.join(", ") : drink.ingredients}</p>
+          <p><strong>Glassware:</strong> ${drink.glassware || "—"}</p>
+          <p><strong>Method:</strong> ${drink.method || "—"}</p>
+          <p><strong>Pro Tip:</strong> ${drink.pro_tip || "—"}</p>
+          <p><strong>Did You Know:</strong> ${drink.did_you_know || "—"}</p>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    function editCocktail(slug) {
-      window.location.href = `/cocktail-editor.html?slug=${slug}`;
+    function filterAndSort() {
+      const search = searchInput.value.toLowerCase();
+      const sort = sortSelect.value;
+
+      let filtered = cocktailData.filter(c => c.title.toLowerCase().includes(search));
+      filtered.sort((a, b) =>
+        sort === "asc"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title)
+      );
+      renderCards(filtered);
     }
 
-    loadCocktails();
+    searchInput.addEventListener("input", filterAndSort);
+    sortSelect.addEventListener("change", filterAndSort);
+
+    // Initial render
+    renderCards(cocktailData);
   </script>
 </body>
 </html>
