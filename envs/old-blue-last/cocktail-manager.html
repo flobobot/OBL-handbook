@@ -2,128 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Cocktail Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cocktail Card Manager</title>
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 2rem; }
-    input, textarea, button { display: block; width: 100%; margin-bottom: 1rem; padding: 0.5rem; }
-    .card { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
-    .actions { display: flex; gap: 1rem; }
-    .actions button { flex: 1; }
+    body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; }
+    h1 { font-size: 2rem; }
+    .cocktail-card { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
+    .cocktail-card h2 { margin: 0 0 0.5rem; }
+    .cocktail-card p { margin: 0.25rem 0; }
   </style>
 </head>
 <body>
   <h1>Cocktail Card Manager</h1>
-  <div id="cocktail-list"></div>
-
-  <h2 id="form-title">Add New Cocktail</h2>
-  <form id="cocktail-form">
-    <input type="text" id="title" placeholder="Title" required />
-    <textarea id="ingredients" placeholder="Ingredients" required></textarea>
-    <input type="text" id="glassware" placeholder="Glassware" />
-    <textarea id="method" placeholder="Method"></textarea>
-    <input type="text" id="proTip" placeholder="Pro Tip" />
-    <input type="text" id="didYouKnow" placeholder="Did You Know" />
-    <button type="submit">Save</button>
-  </form>
+  <div id="cocktail-list">Loading cocktails...</div>
 
   <script>
-    let cocktails = [];
-    let editingIndex = -1;
-
-    async function fetchCocktails() {
+    async function loadCocktails() {
       try {
-        const res = await fetch('/.netlify/functions/load-cocktail-data');
-        const data = await res.json();
-        cocktails = Array.isArray(data) ? data : [];
-        renderCocktails();
-      } catch (err) {
-        console.error('❌ Failed to load cocktails:', err);
-        cocktails = [];
-      }
-    }
+        const response = await fetch("/.netlify/functions/load-cocktail-data");
+        const cocktails = await response.json();
 
-    function renderCocktails() {
-      const list = document.getElementById('cocktail-list');
-      list.innerHTML = '';
-      cocktails.forEach((c, i) => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-          <strong>${c.title}</strong><br>
-          <em>${c.ingredients}</em><br>
-          <small>${c.method}</small>
-          <div class="actions">
-            <button onclick="editCocktail(${i})">Edit</button>
-            <button onclick="deleteCocktail(${i})">Delete</button>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-    }
+        const container = document.getElementById("cocktail-list");
+        container.innerHTML = "";
 
-    function editCocktail(index) {
-      const c = cocktails[index];
-      document.getElementById('form-title').textContent = 'Edit Cocktail';
-      document.getElementById('title').value = c.title;
-      document.getElementById('ingredients').value = c.ingredients;
-      document.getElementById('glassware').value = c.glassware || '';
-      document.getElementById('method').value = c.method || '';
-      document.getElementById('proTip').value = c.proTip || '';
-      document.getElementById('didYouKnow').value = c.didYouKnow || '';
-      editingIndex = index;
-    }
+        cocktails.forEach(cocktail => {
+          const card = document.createElement("div");
+          card.className = "cocktail-card";
 
-    function deleteCocktail(index) {
-      if (confirm('Delete this cocktail?')) {
-        cocktails.splice(index, 1);
-        saveCocktails();
-      }
-    }
-
-    document.getElementById('cocktail-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const cocktail = {
-        title: document.getElementById('title').value,
-        ingredients: document.getElementById('ingredients').value,
-        glassware: document.getElementById('glassware').value,
-        method: document.getElementById('method').value,
-        proTip: document.getElementById('proTip').value,
-        didYouKnow: document.getElementById('didYouKnow').value
-      };
-
-      if (editingIndex >= 0) {
-        cocktails[editingIndex] = cocktail;
-      } else {
-        cocktails.push(cocktail);
-      }
-
-      await saveCocktails();
-      editingIndex = -1;
-      e.target.reset();
-      document.getElementById('form-title').textContent = 'Add New Cocktail';
-    });
-
-    async function saveCocktails() {
-      try {
-        const res = await fetch('/.netlify/functions/save-cocktail-drive', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: 'florian',
-            password: '280984',
-            data: cocktails
-          })
+          card.innerHTML = `
+            <h2>${cocktail.title}</h2>
+            <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
+            <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+            <p><strong>Method:</strong> ${cocktail.method}</p>
+            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</p>
+            <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</p>
+          `;
+          container.appendChild(card);
         });
-        const result = await res.json();
-        console.log('✅ Save result:', result);
-        fetchCocktails();
       } catch (err) {
-        alert('❌ Failed to save cocktail data. Please try again.');
+        document.getElementById("cocktail-list").innerText = "Failed to load cocktail data.";
         console.error(err);
       }
     }
 
-    fetchCocktails();
+    loadCocktails();
   </script>
 </body>
 </html>
