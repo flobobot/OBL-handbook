@@ -2,91 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Old Blue Last Cocktail Manager</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8f8f8;
       margin: 0;
-      padding: 2rem;
-      background: #f4f4f4;
+      padding: 0;
     }
-
-    nav {
-      background: #222;
+    header {
+      background: #111;
       color: white;
-      padding: 1rem;
+      padding: 0.8rem 2rem;
       display: flex;
       gap: 2rem;
     }
-
-    nav a {
+    header a {
       color: white;
       text-decoration: none;
       font-weight: bold;
     }
-
     h1 {
-      margin-top: 2rem;
       font-size: 1.8rem;
+      padding: 2rem;
     }
-
-    .card {
+    .cocktail-card {
       background: white;
-      padding: 1rem;
+      margin: 1rem auto;
+      padding: 1rem 2rem;
       border-radius: 8px;
-      margin: 1rem 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 720px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
     }
-
-    .card h2 {
-      margin-top: 0;
+    .cocktail-card h2 {
+      margin: 0.2rem 0 0.6rem;
     }
-
     .error {
       color: red;
       font-weight: bold;
+      text-align: center;
+      padding: 1rem;
     }
   </style>
 </head>
 <body>
-  <nav>
+  <header>
     <a href="/cocktail-manager.html">Cocktails</a>
     <a href="/training.html">Training</a>
     <a href="/admin.html">Admin</a>
     <a href="/login.html">Login</a>
-  </nav>
+  </header>
 
   <h1>Old Blue Last Cocktail Manager</h1>
-  <div id="cocktailList">Loading...</div>
+  <div id="cocktail-list"></div>
+  <div id="error" class="error"></div>
 
   <script>
+    const DATA_URL = "/data/cocktail_data_backup.json";
+
     async function loadCocktails() {
-      const container = document.getElementById("cocktailList");
       try {
-        const res = await fetch("/netlify/data/cocktail_data_backup.json");
-        const data = await res.json();
-        const cocktails = Array.isArray(data) ? data : [];
+        const res = await fetch(DATA_URL);
+        if (!res.ok) throw new Error("Could not load cocktail data");
+        const cocktails = await res.json();
 
-        if (cocktails.length === 0) {
-          container.innerHTML = '<p class="error">No cocktail data found.</p>';
-          return;
-        }
+        const container = document.getElementById("cocktail-list");
+        container.innerHTML = "";
 
-        container.innerHTML = cocktails.map(c => `
-          <div class="card">
-            <h2>${c.title || "Untitled Cocktail"}</h2>
-            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(', ') : c.ingredients || "N/A"}</p>
-            <p><strong>Glassware:</strong> ${c.glassware || "N/A"}</p>
-            <p><strong>Method:</strong> ${c.method || "N/A"}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip || "N/A"}</p>
-            <p><strong>Did You Know:</strong> ${c.did_you_know || "N/A"}</p>
+        cocktails.forEach(c => {
+          const card = document.createElement("div");
+          card.className = "cocktail-card";
+          card.innerHTML = `
+            <h2>${c.title}</h2>
+            <p><strong>Ingredients:</strong> ${c.ingredients.join(", ")}</p>
+            <p><strong>Glassware:</strong> ${c.glassware}</p>
+            <p><strong>Method:</strong> ${c.method}</p>
+            <p><strong>Pro Tip:</strong> ${c.pro_tip || "—"}</p>
             <p><strong>Category:</strong> ${c.tag || "Uncategorised"}</p>
-          </div>
-        `).join("");
+          `;
+          container.appendChild(card);
+        });
       } catch (err) {
+        document.getElementById("error").textContent =
+          "Failed to load cocktail data. Please check the Drive link or format.";
         console.error("Load error:", err);
-        container.innerHTML = `<p class="error">Failed to load cocktail data. Please check the Drive link or format.</p>`;
       }
     }
 
