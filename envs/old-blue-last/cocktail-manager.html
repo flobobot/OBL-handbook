@@ -29,12 +29,7 @@
       gap: 1rem;
       margin-bottom: 1rem;
     }
-    input[type="text"] {
-      padding: 0.5rem;
-      font-size: 1rem;
-      width: 200px;
-    }
-    select {
+    input[type="text"], select {
       padding: 0.5rem;
       font-size: 1rem;
     }
@@ -79,25 +74,24 @@
   <div id="cards">Loading...</div>
 
   <script>
-    const searchInput = document.getElementById('searchInput');
-    const sortSelect = document.getElementById('sortSelect');
-    const cardsDiv = document.getElementById('cards');
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
+    const cardsDiv = document.getElementById("cards");
 
     let cocktails = [];
 
     async function loadCocktails() {
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
+        if (!res.ok) throw new Error("Failed to fetch cocktail data");
         const data = await res.json();
 
-        // Validate shape
-        if (!Array.isArray(data)) throw new Error("Invalid cocktail data array");
-
+        if (!Array.isArray(data)) throw new Error("Data is not an array");
         cocktails = data;
         renderCards();
       } catch (err) {
-        console.error("Error loading cocktail data:", err);
-        cardsDiv.innerHTML = "<p>Error loading cocktails.</p>";
+        console.error("Error loading cocktails:", err);
+        cardsDiv.innerHTML = "<p style='color:red;'>Error loading cocktail data. Check server logs or Drive file format.</p>";
       }
     }
 
@@ -106,18 +100,16 @@
       const sort = sortSelect.value;
 
       let filtered = cocktails.filter(cocktail => {
-        return (
-          cocktail.title?.toLowerCase().includes(search) ||
-          cocktail.ingredients?.toLowerCase().includes(search) ||
-          cocktail.method?.toLowerCase().includes(search) ||
-          cocktail.pro_tip?.toLowerCase().includes(search) ||
-          cocktail.did_you_know?.toLowerCase().includes(search)
-        );
+        const text = [cocktail.title, cocktail.ingredients, cocktail.method, cocktail.pro_tip, cocktail.did_you_know]
+          .map(val => val?.toLowerCase() || "")
+          .join(" ");
+        return text.includes(search);
       });
 
       filtered.sort((a, b) => {
-        if (sort === "az") return a.title.localeCompare(b.title);
-        else return b.title.localeCompare(a.title);
+        const tA = a.title || "";
+        const tB = b.title || "";
+        return sort === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
       });
 
       if (filtered.length === 0) {
@@ -125,20 +117,24 @@
         return;
       }
 
-      cardsDiv.innerHTML = filtered.map(cocktail => `
+      cardsDiv.innerHTML = filtered.map(c => `
         <div class="card">
-          <h3>${cocktail.title || "Untitled Cocktail"}</h3>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients || "-"}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware || "-"}</p>
-          <p><strong>Method:</strong> ${cocktail.method || "-"}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</p>
-          <button class="edit-btn" onclick="editCocktail('${cocktail.slug}')">Edit</button>
+          <h3>${c.title || "Untitled Cocktail"}</h3>
+          <p><strong>Ingredients:</strong> ${c.ingredients || "-"}</p>
+          <p><strong>Glassware:</strong> ${c.glassware || "-"}</p>
+          <p><strong>Method:</strong> ${c.method || "-"}</p>
+          <p><strong>Pro Tip:</strong> ${c.pro_tip || "-"}</p>
+          <p><strong>Did You Know:</strong> ${c.did_you_know || "-"}</p>
+          <button class="edit-btn" onclick="editCocktail('${c.slug}')">Edit</button>
         </div>
-      `).join('');
+      `).join("");
     }
 
     function editCocktail(slug) {
+      if (!slug) {
+        alert("No slug found for this cocktail.");
+        return;
+      }
       window.location.href = `cocktail-editor.html?slug=${slug}`;
     }
 
