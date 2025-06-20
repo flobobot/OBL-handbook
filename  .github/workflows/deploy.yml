@@ -1,7 +1,7 @@
 name: Deploy Environments
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:       # ✅ CORRECT top-level trigger
 
 jobs:
   debug:
