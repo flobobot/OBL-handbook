@@ -1,5 +1,12 @@
 [build]
-  publish = "envs/old-blue-last"
+  publish = "netlify"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/netlify/data/cocktail_data_backup.json"
+  to = "/netlify/data/cocktail_data_backup.json"
+  status = 200
+  force = true
 
 [functions]
   directory = "netlify/functions"
