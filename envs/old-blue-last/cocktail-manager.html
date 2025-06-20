@@ -34,13 +34,15 @@
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
         const json = await res.json();
-        const cocktails = JSON.parse(json.body);
+        const raw = json.body;
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (!Array.isArray(parsed)) throw new Error("Cocktail data is not an array");
 
         const grouped = {};
-        for (const cocktail of cocktails) {
-          const category = cocktail.category?.trim() || "Uncategorised";
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(cocktail);
+        for (const c of parsed) {
+          const cat = c.category?.trim() || "Uncategorised";
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(c);
         }
 
         renderCards(grouped);
@@ -63,7 +65,7 @@
         title.textContent = cat;
         container.appendChild(title);
 
-        let cards = grouped[cat].filter(c => c.title.toLowerCase().includes(search));
+        let cards = grouped[cat].filter(c => c.title?.toLowerCase().includes(search));
         cards.sort((a, b) => sort === "az" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
 
         for (const c of cards) {
@@ -71,11 +73,11 @@
           card.className = "border rounded p-4 shadow bg-white";
           card.innerHTML = `
             <h3 class="text-lg font-bold mb-2">${c.title}</h3>
-            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}</p>
-            <p><strong>Glassware:</strong> ${c.glassware}</p>
-            <p><strong>Method:</strong> ${c.method}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip}</p>
-            <p><strong>Did You Know:</strong> ${c.did_you_know}</p>
+            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients || "—"}</p>
+            <p><strong>Glassware:</strong> ${c.glassware || "—"}</p>
+            <p><strong>Method:</strong> ${c.method || "—"}</p>
+            <p><strong>Pro Tip:</strong> ${c.pro_tip || "—"}</p>
+            <p><strong>Did You Know:</strong> ${c.did_you_know || "—"}</p>
             <a href="cocktail-editor.html?slug=${c.slug}" class="mt-2 inline-block text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Edit</a>
           `;
           container.appendChild(card);
