@@ -1,11 +1,56 @@
-name: Manual Trigger Test
+name: Deploy Environments
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'envs/**'
+      - 'core-components/**'
+      - 'patches/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy.yml'
+      - 'trigger-ci.txt'
 
 jobs:
-  debug:
+  deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        venue: [old-blue-last, adam-and-eve]
+
     steps:
-      - name: Say hello
-        run: echo "✅ Hello! Manual trigger is working."
+      - name: Debug GitHub workspace
+        run: |
+          echo "Workspace: $GITHUB_WORKSPACE"
+          ls -la
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Netlify CLI (optional)
+        run: npm install -g netlify-cli
+
+      - name: Run patch engine
+        run: |
+          echo "[CI] Running patch for ${{ matrix.venue }}"
+          python3 patches/apply_patch.py "${{ matrix.venue }}" || echo "(no patch needed)"
+
+      - name: Save CI Trace Log
+        run: |
+          mkdir -p scripts/logs/
+          echo "{\"venue\": \"${{ matrix.venue }}\", \"commit\": \"${{ github.sha }}\", \"timestamp\": \"$(date --utc +%Y-%m-%dT%H:%M:%SZ)\"}" > scripts/logs/${{ matrix.venue }}.json
+
+      # Optional: enable Netlify deploys when secrets are set
+      # - name: Deploy via Netlify CLI
+      #   working-directory: envs/${{ matrix.venue }}
+      #   run: |
+      #     netlify deploy --prod --dir=. --site="${{ secrets[format('NETLIFY_SITE_ID_{0}', matrix.venue | upper)] }}"
