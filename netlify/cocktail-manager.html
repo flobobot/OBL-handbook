@@ -2,91 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f8f8f8;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: #f8f8f8;
     }
-    header {
+    nav {
       background: #111;
-      color: white;
-      padding: 0.8rem 2rem;
+      padding: 12px 24px;
       display: flex;
-      gap: 2rem;
+      gap: 20px;
     }
-    header a {
+    nav a {
       color: white;
       text-decoration: none;
       font-weight: bold;
     }
-    h1 {
-      font-size: 1.8rem;
-      padding: 2rem;
+    .container {
+      padding: 32px;
     }
-    .cocktail-card {
+    .card {
       background: white;
-      margin: 1rem auto;
-      padding: 1rem 2rem;
       border-radius: 8px;
-      max-width: 720px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .cocktail-card h2 {
-      margin: 0.2rem 0 0.6rem;
+    .card h2 {
+      margin-top: 0;
+    }
+    .field-label {
+      font-weight: bold;
     }
     .error {
       color: red;
-      font-weight: bold;
-      text-align: center;
-      padding: 1rem;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
+  <nav>
     <a href="/cocktail-manager.html">Cocktails</a>
     <a href="/training.html">Training</a>
     <a href="/admin.html">Admin</a>
     <a href="/login.html">Login</a>
-  </header>
+  </nav>
 
-  <h1>Old Blue Last Cocktail Manager</h1>
-  <div id="cocktail-list"></div>
-  <div id="error" class="error"></div>
+  <div class="container">
+    <h1>Old Blue Last Cocktail Manager</h1>
+    <div id="cocktail-list">Loading...</div>
+  </div>
 
   <script>
-    const DATA_URL = "/data/cocktail_data_backup.json";
-
     async function loadCocktails() {
       try {
-        const res = await fetch(DATA_URL);
-        if (!res.ok) throw new Error("Could not load cocktail data");
-        const cocktails = await res.json();
+        const response = await fetch('/data/cocktail_data_backup.json');
+        const cocktails = await response.json();
 
-        const container = document.getElementById("cocktail-list");
-        container.innerHTML = "";
+        const container = document.getElementById('cocktail-list');
+        container.innerHTML = '';
 
-        cocktails.forEach(c => {
-          const card = document.createElement("div");
-          card.className = "cocktail-card";
+        cocktails.forEach(cocktail => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
           card.innerHTML = `
-            <h2>${c.title}</h2>
-            <p><strong>Ingredients:</strong> ${c.ingredients.join(", ")}</p>
-            <p><strong>Glassware:</strong> ${c.glassware}</p>
-            <p><strong>Method:</strong> ${c.method}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip || "—"}</p>
-            <p><strong>Category:</strong> ${c.tag || "Uncategorised"}</p>
+            <h2>${cocktail.title || 'Untitled'}</h2>
+            <p><span class="field-label">Ingredients:</span> ${Array.isArray(cocktail.ingredients) ? cocktail.ingredients.join(', ') : 'N/A'}</p>
+            <p><span class="field-label">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
+            <p><span class="field-label">Method:</span> ${cocktail.method || 'N/A'}</p>
+            <p><span class="field-label">Pro Tip:</span> ${cocktail['pro_tip'] || 'N/A'}</p>
+            <p><span class="field-label">Did You Know:</span> ${cocktail['did_you_know'] || 'N/A'}</p>
+            <p><span class="field-label">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
           `;
+
           container.appendChild(card);
         });
       } catch (err) {
-        document.getElementById("error").textContent =
-          "Failed to load cocktail data. Please check the Drive link or format.";
-        console.error("Load error:", err);
+        document.getElementById('cocktail-list').innerHTML = '<p class="error">Failed to load cocktail data. Please check the Drive link or format.</p>';
+        console.error('Load error:', err);
       }
     }
 
