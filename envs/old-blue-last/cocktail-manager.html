@@ -2,101 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cocktail Card Manager</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 800px;
-      margin: auto;
-    }
-    .card {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      border-radius: 6px;
-      background-color: #fdfdfd;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-    .card h3 {
-      margin-top: 0;
-    }
-    .card p {
-      margin: 0.5rem 0;
-    }
-    .card button {
-      background: #0070f3;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      margin-top: 0.75rem;
-      border-radius: 4px;
-    }
-    .card button:hover {
-      background: #0059c1;
-    }
-    #cocktail-list.empty {
-      text-align: center;
-      font-style: italic;
-      color: #666;
-    }
-  </style>
+  <script defer src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Cocktail Card Manager</h1>
-  <div id="cocktail-list">Loading...</div>
+<body class="bg-white text-black px-8 py-6">
+  <!-- Top Navigation -->
+  <nav class="mb-8">
+    <ul class="flex gap-6 text-lg font-semibold">
+      <li><a href="/cocktail-manager.html" class="underline">Cocktails</a></li>
+      <li><a href="/training.html">Training</a></li>
+      <li><a href="/admin.html">Admin</a></li>
+      <li><a href="/login.html">Login</a></li>
+    </ul>
+  </nav>
+
+  <h1 class="text-3xl font-bold mb-4">Cocktail Card Manager</h1>
+
+  <!-- Filter and Sort Controls -->
+  <div class="flex flex-wrap gap-4 items-center mb-6">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Search cocktails..."
+      class="border border-gray-300 rounded px-4 py-2 w-64"
+    />
+    <select
+      id="sortSelect"
+      class="border border-gray-300 rounded px-4 py-2"
+    >
+      <option value="asc">Sort: A–Z</option>
+      <option value="desc">Sort: Z–A</option>
+    </select>
+  </div>
+
+  <div id="cocktailList">Loading...</div>
 
   <script>
     async function fetchCocktails() {
       try {
-        const res = await fetch('/.netlify/functions/load-cocktail-data');
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const res = await fetch("/.netlify/functions/load-cocktail-data");
         const data = await res.json();
-        if (!Array.isArray(data)) throw new Error('Data is not an array');
-        return data;
+        const cocktails = JSON.parse(data.body);
+        renderCocktails(cocktails);
+
+        document.getElementById("searchInput").addEventListener("input", () => {
+          renderCocktails(cocktails);
+        });
+
+        document.getElementById("sortSelect").addEventListener("change", () => {
+          renderCocktails(cocktails);
+        });
       } catch (err) {
-        console.error('Error fetching cocktail data:', err);
-        return [];
+        console.error("Failed to load cocktails:", err);
+        document.getElementById("cocktailList").textContent = "Error loading cocktails.";
       }
     }
 
-    function renderCocktailCard(cocktail) {
-      const {
-        title = 'Untitled',
-        ingredients = '',
-        glassware = '',
-        method = '',
-        pro_tip = '',
-        did_you_know = '',
-        slug = ''
-      } = cocktail;
+    function renderCocktails(cocktails) {
+      const list = document.getElementById("cocktailList");
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const sortOrder = document.getElementById("sortSelect").value;
 
-      return `
-        <div class="card">
-          <h3>${title}</h3>
-          <p><strong>Ingredients:</strong> ${ingredients}</p>
-          <p><strong>Glassware:</strong> ${glassware}</p>
-          <p><strong>Method:</strong> ${method}</p>
-          <p><strong>Pro Tip:</strong> ${pro_tip}</p>
-          <p><strong>Did You Know:</strong> ${did_you_know}</p>
-          <button onclick="location.href='/cocktail-editor.html?slug=${encodeURIComponent(slug)}'">Edit</button>
-        </div>
-      `;
-    }
+      let filtered = cocktails.filter(c =>
+        c.title.toLowerCase().includes(query)
+      );
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      const container = document.getElementById('cocktail-list');
-      const cocktails = await fetchCocktails();
-
-      if (cocktails.length === 0) {
-        container.classList.add('empty');
-        container.textContent = 'No cocktail cards found.';
+      if (sortOrder === "asc") {
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
       } else {
-        container.innerHTML = cocktails.map(renderCocktailCard).join('');
+        filtered.sort((a, b) => b.title.localeCompare(a.title));
       }
-    });
+
+      list.innerHTML = filtered
+        .map(c => `
+          <div class="border rounded p-4 mb-4 shadow-sm">
+            <h2 class="text-xl font-bold mb-2">${c.title}</h2>
+            <p><strong>Ingredients:</strong> ${c.ingredients}</p>
+            <p><strong>Glassware:</strong> ${c.glassware}</p>
+            <p><strong>Method:</strong> ${c.method}</p>
+            <p><strong>Pro Tip:</strong> ${c.pro_tip}</p>
+            <p><strong>Did You Know:</strong> ${c.did_you_know}</p>
+            <a href="/cocktail-editor.html?slug=${c.slug}">
+              <button class="mt-2 bg-blue-600 text-white px-4 py-1 rounded">Edit</button>
+            </a>
+          </div>
+        `)
+        .join("");
+    }
+
+    fetchCocktails();
   </script>
 </body>
 </html>
