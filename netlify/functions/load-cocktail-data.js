@@ -5,7 +5,7 @@ const fs = require('fs');
 exports.handler = async function (event) {
   try {
     // 1. Load credentials
-    const credentialsPath = path.resolve(__dirname, 'flobocorp-automation-cac461eb14c1.json');
+    const credentialsPath = path.resolve(__dirname, 'flobocorp-automation-3ac38a3f9c31.json');
     const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
     // 2. Authenticate using service account
