@@ -1,0 +1,660 @@
+[
+  {
+    "title": "Disco Sour",
+    "ingredients": [
+      "El Gobernador (apricot infused): 40ml",
+      "Lemon Juice: 20ml",
+      "Velvet Falernum: 20ml",
+      "Benedictine: 10ml",
+      "Egg White: 25ml",
+      "Sugar Syrup: 5ml",
+      "Orange Bitters: 1 dash"
+    ],
+    "method": "Dry shake, then wet shake. Fine strain into a coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Apricot fan or Angostura design\n",
+    "pro_tip": "The blend of Falernum, Benedictine and apricot-infused pisco gives this a velvety body and tropical funk. Use with confidence once staff reach Level 3.\n",
+    "did_you_know": "This is a neo-classic \u2014 not found in century-old books but gaining popularity in high-end bars with creative menus.",
+    "filename": "Disco Sour 207ce1fd2e9381d28503e5c1a26f3ecc.md",
+    "tag": "House Riff",
+    "slug": "disco-sour"
+  },
+  {
+    "title": "Tequila Paloma",
+    "ingredients": [
+      "Cazcabel Reposado: 50ml",
+      "Lime: 20ml",
+      "Agave: 5ml",
+      "Grapefruit: 40ml",
+      "Pomelo Pink & Pepper Tonic or soda: 60ml"
+    ],
+    "method": "Build in a highball with ice, stir, and top with tonic or soda.\n",
+    "glassware": "Highball\n",
+    "garnish": "Grapefruit slice\n",
+    "pro_tip": "Add a pinch of salt to highlight the peppery reposado and citrus.\n",
+    "did_you_know": "Paloma is the national drink of Mexico \u2014 more popular than the Margarita locally!",
+    "filename": "Tequila Paloma 207ce1fd2e9381b09484ce15ed877a91.md",
+    "tag": "Classic",
+    "slug": "tequila-paloma"
+  },
+  {
+    "title": "Royal Kir",
+    "ingredients": [
+      "Prosecco: 125ml",
+      "Hayman\u2019s Sloe Gin: 25ml"
+    ],
+    "method": "Build in a flute. Add sloe gin first, then top with chilled prosecco.\n",
+    "glassware": "Flute\n",
+    "garnish": "Optional lemon twist\n",
+    "pro_tip": "Pour prosecco slowly down the inside of the flute to preserve bubbles.\n",
+    "did_you_know": "The Royal Kir is a sparkling version of the traditional Kir cocktail, which uses cr\u00e8me de cassis and white wine.",
+    "filename": "Royal Kir 207ce1fd2e9381e9b305cd2f153f33b4.md",
+    "tag": "Classic",
+    "slug": "royal-kir"
+  },
+  {
+    "title": "Sundance",
+    "ingredients": [
+      "Havana 3yo Rum: 30ml",
+      "Bulleit Rye: 20ml",
+      "Dolin Sweet Vermouth (red): 20ml",
+      "Cynar: 5ml",
+      "Frangelico: 10ml"
+    ],
+    "method": "Stir with ice and strain into a rocks glass over fresh ice.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Orange twist\n",
+    "pro_tip": "Balancing rye spice, rum warmth, and bitter liqueurs \u2014 a riff on the Connaught\u2019s Everglow.\n",
+    "did_you_know": "Cynar is an artichoke-based amaro, bringing vegetal depth to many contemporary cocktails. In this case the seeming overkill in ingredients really pays off and creates a rare but unique and surprisingly round finish.",
+    "filename": "Sundance 207ce1fd2e938187802ccaca9fa20323.md",
+    "tag": "Uncategorised",
+    "slug": "sundance"
+  },
+  {
+    "title": "Fogcutter",
+    "ingredients": [
+      "Diplomatico: 25ml",
+      "Greenalls: 15ml",
+      "Martell VS: 15ml",
+      "Lemon: 20ml",
+      "Orange Juice: 20ml",
+      "Orgeat: 15ml",
+      "Fino Sherry: 10ml"
+    ],
+    "method": "Shake with ice, strain into a highball glass, float sherry on top.\n",
+    "glassware": "Highball\n",
+    "garnish": "Mint sprig\n",
+    "pro_tip": "Layering the fino on top preserves its crisp dryness before blending with the rich body below.\n",
+    "did_you_know": "The Fogcutter is a tiki classic invented in the 1940s \u2014 known as \u2018the Long Island Iced Tea of the tropics.\u2019",
+    "filename": "Fogcutter 207ce1fd2e9381719549f40d2340f38e.md",
+    "tag": "Uncategorised",
+    "slug": "fogcutter"
+  },
+  {
+    "title": "The Dirty Martini",
+    "ingredients": [
+      "East Ldn Gin or Vodka: 50ml",
+      "Dollin white vermouth: 10ml",
+      "Olive brine: 10ml"
+    ],
+    "method": "Stir over ice and strain into a chilled martini glass.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Green olive\n",
+    "pro_tip": "Ask how dirty they want it \u2014 more brine = saltier, murkier.\n",
+    "did_you_know": "The Dirty Martini was created in 1901 when bartender John O\u2019Connor added olive brine to a traditional Martini. How dirty can youn go? Beware of customers requesting ludicrous amounts of olives - this is not part of your five a day!",
+    "filename": "The Dirty Martini 207ce1fd2e938161b7e9e74c99422433.md",
+    "tag": "Classic",
+    "slug": "the-dirty-martini"
+  },
+  {
+    "title": "Mezcal Paloma",
+    "ingredients": [
+      "Quiquiriqui Mezcal: 50ml",
+      "Lime: 20ml",
+      "Agave: 5ml",
+      "Grapefruit: 40ml",
+      "Pomelo Pink & Pepper Tonic or soda: 60ml"
+    ],
+    "method": "Build in a Collins glass over ice, stir gently. Top with tonic (or soda depending on availability).\n",
+    "glassware": "Collins\n",
+    "garnish": "Grapefruit wedge and lime wheel\n",
+    "pro_tip": "Balance the grapefruit and agave \u2014 Mezcal\u2019s smoky note can dominate if unbalanced.\n",
+    "did_you_know": "A Paloma is more commonly drunk than a Margarita in Mexico. The mezcal twist adds richness and modern flair.",
+    "filename": "Mezcal Paloma 207ce1fd2e9381ffa7f3f539080ef9b0.md",
+    "tag": "Uncategorised",
+    "slug": "mezcal-paloma"
+  },
+  {
+    "title": "Gin Fizz",
+    "ingredients": [
+      "Portobello Road Gin: 50ml",
+      "Simple Syrup: 12.5ml",
+      "Lemon Juice: 25ml"
+    ],
+    "method": "Shake with ice and strain into a Collins glass. Top with soda.\n",
+    "glassware": "Collins\n",
+    "garnish": "Lemon slice\n",
+    "pro_tip": "Fizzes are classic summer refreshers \u2014 chill all components for maximum sparkle.\n",
+    "did_you_know": "The Gin Fizz was so popular in 1880s New Orleans that bars hired teams of shaker boys to keep up with demand.",
+    "filename": "Gin Fizz 207ce1fd2e9381aa8240e410de4a53ff.md",
+    "tag": "Classic",
+    "slug": "gin-fizz"
+  },
+  {
+    "title": "Flint",
+    "ingredients": [
+      "Martell: 30ml",
+      "Green Chartreuse: 5ml",
+      "Midori: 10ml",
+      "Pomelo Pink & Pepper Tonic: 40ml"
+    ],
+    "method": "Build over ice in a highball glass. Gently stir to integrate.\n",
+    "glassware": "Highball\n",
+    "garnish": "Grapefruit twist or melon ball\n",
+    "pro_tip": "This is a layered flavour bomb: herbal, fruity, and spicy from the tonic. Serve cold and bright.\n",
+    "did_you_know": "Inspired by the mineral and fruity contrast found in Flint terroirs, this drink plays off the complex mid-tones of chartreuse and melon.",
+    "filename": "Flint 207ce1fd2e938196aaddf4c6b3865a33.md",
+    "tag": "House Riff",
+    "slug": "flint"
+  },
+  {
+    "title": "The Whiskey Sour",
+    "ingredients": [
+      "Woodford Reserve: 50ml",
+      "Lemon Juice: 25ml",
+      "Simple Syrup or Gomme: 10ml",
+      "Egg White: 25ml"
+    ],
+    "method": "Dry shake without ice, then shake again with ice. Fine strain into a chilled coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Angostura design or lemon twist\n",
+    "pro_tip": "Dry shaking helps emulsify egg white for the perfect foam \u2014 a hallmark of a well-executed sour.\n",
+    "did_you_know": "One of the oldest cocktail families, the sour template (spirit + citrus + sweet) is found in dozens of drinks across cultures and its simple ratios have become the backbone of modern mixology. Some things will never change. Perfect this drink, present it right and you win the hearts of even the harshest critics.",
+    "filename": "The Whiskey Sour 207ce1fd2e9381a88932ee11d65ab59f.md",
+    "tag": "Uncategorised",
+    "slug": "the-whiskey-sour"
+  },
+  {
+    "title": "The Margarita",
+    "ingredients": [
+      "Ocho 8 Tequila: 50ml",
+      "Lime: 20ml",
+      "Agave Syrup: 5ml",
+      "Cointreau Triple Sec: 10ml"
+    ],
+    "method": "Shake vigorously and fine strain into a coupette or rocks glass with optional salt rim.\n",
+    "glassware": "Coupette or Rocks\n",
+    "garnish": "Dehydrated lime wheel or salt rim\n",
+    "pro_tip": "Ocho\u2019s peppery profile adds bright spice to the traditional Margarita.\n",
+    "did_you_know": "The Margarita\u2019s origin is contested \u2014 some credit it to Tijuana in the 1930s, others to Texas in the 1940s. I just think it imply belongs in my mouth and can live in there rent free forever.",
+    "filename": "The Margarita 207ce1fd2e9381a5b198e4e6a419d13e.md",
+    "tag": "Classic",
+    "slug": "the-margarita"
+  },
+  {
+    "title": "In the Woods",
+    "ingredients": [
+      "Cacao Nib infused Stoli: 50ml",
+      "Lime: 10ml",
+      "Beetroot & Blackberry Cordial: 20ml",
+      "Orange Bitters: 2 dashes"
+    ],
+    "method": "Shake hard and fine strain into a chilled coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Blackberry or edible flower\n",
+    "pro_tip": "Batching the cordial in-house lets you control sugar and acidity \u2014 a true Level 3 showcase.\n",
+    "did_you_know": "Inspired by the \u2018Mysterious Woodlands\u2019 style \u2014 earthy, deep, slightly sweet with a hint of wild.",
+    "filename": "In the Woods 207ce1fd2e9381d09e4ec8df91d680be.md",
+    "tag": "House Riff",
+    "slug": "in-the-woods"
+  },
+  {
+    "title": "The Classic Negroni",
+    "ingredients": [
+      "Tanqueray: 25ml",
+      "Cocchi di Torrino: 25ml",
+      "Campari: 25ml"
+    ],
+    "method": "Stir well with ice in a Japanese stirring glass for dramatic effect - however this concoction should be \u201cthrown\u201d to aerate and add smoothness to this ever-bold drink. Strain into a rocks glass over fresh ice, ideally one big cube.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Orange peel, expressed and stuck to the side, like a rabbit's ear.\n",
+    "pro_tip": "Tanqueray\u2019s bold juniper works beautifully with Cocchi\u2019s bitter-sweet complexity.\nStir until the liquid clings slightly to the glass.\n",
+    "did_you_know": "The Negroni originated in Florence around 1919 when Count Camillo Negroni requested his Americano be made stronger. It\u2019s now the world\u2019s go-to aperitivo (or fuel for next-day dread)",
+    "filename": "The Classic Negroni 207ce1fd2e938137b492e6d4b8d59d50.md",
+    "tag": "Classic",
+    "slug": "the-classic-negroni"
+  },
+  {
+    "title": "The Caipirinha",
+    "ingredients": [
+      "Cacha\u00e7a: 50ml",
+      "Brown sugar syrup: 15ml",
+      "Lime"
+    ],
+    "method": "Muddle 4 lime wedges with sugar in a rocks glass, add crushed ice, pour cacha\u00e7a, cap shake and serve.\n",
+    "glassware": "Rocks\n",
+    "garnish": "None \u2014 rustic serve\n",
+    "pro_tip": "Use fresh limes and soft brown sugar for the most authentic flavour. Only use solid, thick glassware for this!\n",
+    "did_you_know": "The national drink of Brazil, Caipirinha\u2019s name comes from \u2018caipira\u2019, meaning a person from the countryside. It is, simply put, something that encapsulates long tradition and simplicity. The cap shake makes it very fun to make.",
+    "filename": "The Caipirinha 207ce1fd2e9381448d6fe9a4be70aaae.md",
+    "tag": "Classic",
+    "slug": "the-caipirinha"
+  },
+  {
+    "title": "The Gibson Martini",
+    "ingredients": [
+      "East Ldn Gin: 50ml",
+      "Dollin white vermouth: 10ml"
+    ],
+    "method": "Stir with ice, strain into a chilled Nick & Nora glass.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Cocktail onion\n",
+    "pro_tip": "Keep onions fresh and chilled \u2014 they are the signature of this savory Martini variation.\n",
+    "did_you_know": "The Gibson is thought to be created by San Francisco businessman Walter D. K. Gibson in the late 19th century, who preferred an onion to an olive. Some say the idea of the cocktail onion as a garnish came from a cunning diplomat, who liked to stay sharp by adding an onion to be able to recognize his drink out of many on a tray being delivered on a tray amidst many, which in fact was just water.  Cunning, though I believe he would have been a much better diplomat with gin and vermouth in his system.",
+    "filename": "The Gibson Martini 207ce1fd2e938172a4a4f7326a2bf844.md",
+    "tag": "Classic",
+    "slug": "the-gibson-martini"
+  },
+  {
+    "title": "Mezcalita",
+    "ingredients": [
+      "Quiquiriqui Matatlan Mezcal: 50ml",
+      "Simple Syrup: 15ml",
+      "Grapefruit Juice: 25ml",
+      "Cointreau Triple Sec: 10ml"
+    ],
+    "method": "Shake and fine strain into a rocks glass over ice.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Basil leaf (optional)\n",
+    "pro_tip": "Mezcal and grapefruit are natural partners \u2014 keep the syrup light to let the spirit shine.\n",
+    "did_you_know": "This is a smoky cousin to the Margarita, increasingly popular on modern menus.",
+    "filename": "Mezcalita 207ce1fd2e93819aa767e6ce751dce74.md",
+    "tag": "Uncategorised",
+    "slug": "mezcalita"
+  },
+  {
+    "title": "Miso Butter Old Fashioned",
+    "ingredients": [
+      "Miso Infused Monkey Shoulder: 20ml",
+      "Brown Sugar Syrup: 15ml",
+      "Ango bitters: 2 dashes",
+      "Orange bitters: 1 dash",
+      "Rittenhouse: 30ml"
+    ],
+    "method": "Stir thoroughly over ice and strain into a rocks glass with large ice cube.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Orange peel\n",
+    "pro_tip": "Miso infusion adds umami \u2014 not for everyone, but bold and rich. Stir gently to preserve aromatics.\n",
+    "did_you_know": "Butter-washed spirits are a modern bartending trend that add texture and subtle savoury depth.",
+    "filename": "Miso Butter Old Fashioned 207ce1fd2e9381239931dcce3254060e.md",
+    "tag": "House Riff",
+    "slug": "miso-butter-old-fashioned"
+  },
+  {
+    "title": "Yuzu Negroni",
+    "ingredients": [
+      "Portobello Road Gin: 25ml",
+      "Punt e Mes: 15ml",
+      "Choya Yuzu: 25ml",
+      "Campari: 25ml"
+    ],
+    "method": "Stir over ice until chilled. Strain over fresh ice into a rocks glass.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Orange peel (expressed)\n",
+    "pro_tip": "Choya Yuzu adds a soft, floral-citrus profile that lifts the bitterness of Campari.\n",
+    "did_you_know": "This is a modern Japanese riff on the classic Negroni \u2014 yuzu is a citrus fruit that tastes like a cross between grapefruit and mandarin.",
+    "filename": "Yuzu Negroni 207ce1fd2e9381c6a03ff3d3f3e1b366.md",
+    "tag": "Uncategorised",
+    "slug": "yuzu-negroni"
+  },
+  {
+    "title": "Negroni Spagliato",
+    "ingredients": [
+      "Cocchi Di Torino: 25ml",
+      "Campari: 25ml",
+      "Prosecco: 50ml"
+    ],
+    "method": "Build in a wine glass or rocks glass over ice and lift gently with a bar spoon.\n",
+    "glassware": "Wine or Rocks\n",
+    "garnish": "Orange wedge or peel\n",
+    "pro_tip": "Great for Negroni lovers seeking a lighter, sparkling alternative.\n",
+    "did_you_know": "The name means \u2018mistaken\u2019 in Italian \u2014 a bartender accidentally swapped gin for Prosecco, and history was made. One of the most iconic mistakes ever made and one of the few ones we have very little to complain about. It makes an otherwise bold \u201cdrinker\u2019s drink\u2019 somewhat sophisticated.",
+    "filename": "Negroni Spagliato 207ce1fd2e9381f18e11d07f8a0a6687.md",
+    "tag": "Classic",
+    "slug": "negroni-spagliato"
+  },
+  {
+    "title": "The Amaretto Sour",
+    "ingredients": [
+      "Disaranno Amaretto: 40ml",
+      "Lemon Juice: 25ml",
+      "Sugar Syrup: 5ml",
+      "Egg White: 20ml",
+      "Rittenhouse: 20ml"
+    ],
+    "method": "Reverse dry-shake. Shake all ingredients without ice, then shake again with ice. Fine strain into a coupette, though some prefer it on the rocks.\n",
+    "glassware": "Coupette or Rocks\n",
+    "garnish": "Maraschino cherry and lemon sail\n",
+    "pro_tip": "Adding a bold rye whiskey like Rittenhouse offsets the sweetness of the Amaretto and gives structure.\n",
+    "did_you_know": "The Amaretto Sour has enjoyed a revival \u2014 especially when made in this modern whiskey-laced style, inspired by Jeffrey Morgenthaler\u2019s version, which replaces overbearing sweetness with a sophisticated attitude. It is nothing short of genius - there really is no need to add sugar to anything based on Amaretto, instead add sharp boldness of an overproof bourbon and you will win the amateur\u2019s and connoisseurs heart. Make sure to observe the reactions.",
+    "filename": "The Amaretto Sour 207ce1fd2e93810aa5f4dac9928ff924.md",
+    "tag": "House Riff",
+    "slug": "the-amaretto-sour"
+  },
+  {
+    "title": "Tommy's Margarita",
+    "ingredients": [
+      "Ocho 8 Tequila: 50ml",
+      "Lime: 25ml",
+      "Agave Syrup: 20ml"
+    ],
+    "method": "Shake all ingredients with ice and fine strain into a rocks glass over fresh ice.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Lime wheel\n",
+    "pro_tip": "Use fresh lime juice and high-quality agave syrup for the best balance.\n",
+    "did_you_know": "Tommy\u2019s Margarita was created in the early 1990s in San Francisco as a simpler, sweeter variation of the classic Margarita \u2014 omitting triple sec in favour of agave syrup.",
+    "filename": "Tommy's Margarita 207ce1fd2e9381368e39e1c38b063e5b.md",
+    "tag": "Classic",
+    "slug": "tommys-margarita"
+  },
+  {
+    "title": "Garden Fizz",
+    "ingredients": [
+      "Seedlip Garden: 50ml",
+      "Lemon Juice: 20ml",
+      "Elderflower Syrup: 15ml"
+    ],
+    "method": "Shake with ice and strain into a highball or Collins. Top with soda.\n",
+    "glassware": "Highball\n",
+    "garnish": "Cucumber ribbon or mint sprig\n",
+    "pro_tip": "Pre-chill glassware and shake hard to make up for the lack of alcohol \u201cburn\u201d \u2014 this keeps the texture crisp and lively.\n",
+    "did_you_know": "Seedlip was the first non-alcoholic spirit brand to reach global acclaim. Garden 108 uses peas and herbs as base botanicals \u2014 a bartender\u2019s friend for N/A menus.",
+    "filename": "Garden Fizz 207ce1fd2e93812ba566cee01b5731c8.md",
+    "tag": "Non-Alcoholic",
+    "slug": "garden-fizz"
+  },
+  {
+    "title": "The Classic Daiquiri",
+    "ingredients": [
+      "Plantarey 3yo Rum: 50ml",
+      "Lime: 20ml",
+      "Simple Syrup: 15ml"
+    ],
+    "method": "Hard shake all ingredients with ice and fine strain into a chilled glass.\n",
+    "glassware": "Coupette, though I believe a Nick and Nora makes it look slicker.\n",
+    "garnish": "None or lime twist.\n",
+    "pro_tip": "Balance is everything: adjust lime and syrup depending on your rum\u2019s sweetness, the Planteray has beautiful, subtle, notes of vanilla which elevate this concoction and add true sophistication. El Dorado (not in our repertoire, sadly) is my absolute favorite but do take note and get yourself a bottle of El Dorado and try it yourself. If you (or your customer) are into a more candy approach, try to sweeten this drink with some agave syrup instead of simps - careful with dosage - but the results are likely to blow their mind if you have a sweet tooth.\n",
+    "did_you_know": "The Daiquiri was invented in Cuba and famously loved by Ernest Hemingway, although he preferred a sugarless version with grapefruit juice - which frankly isn\u2019t very nice. We\u2019re here to enjoy drinks!\n\nAs you all know I am a massive fan of this drink and even though a hard purist, I do like the idea of some variations of this concoction, in particular the Rhubarb and Strawberry riff.\nReplacing the sugar with our rhubarb and strawberry cordial, this drink can actually be elevated to another level and bodes well with some fruity additives. Be aware of its natural fragility and elegance. Getting the proportions wrong can easily turn this into a nightmare in a cup!",
+    "filename": "The Classic Daiquiri 207ce1fd2e938184b1c9d4836d97343c.md",
+    "tag": "Classic",
+    "slug": "the-classic-daiquiri"
+  },
+  {
+    "title": "The Wet Martini",
+    "ingredients": [
+      "East Ldn Vodka or Gin: 50ml",
+      "Dollin White Vermouth: 25ml"
+    ],
+    "method": "Stir thoroughly with plenty of ice until well chilled and slightly diluted. Strain into a chilled Nick & Nora.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Lemon twist or olive\n",
+    "pro_tip": "A \u2018wet\u2019 Martini uses a higher proportion of vermouth. It\u2019s smoother, more aromatic, and more approachable for Martini newcomers.\n",
+    "did_you_know": "Winston Churchill famously preferred his Martini bone dry \u2014 but the wet version is now making a comeback as palates evolve. The difference is subtle, it\u2019s still booze stirred with booze. Some may even say that \u2026 how did I get this drunk? I have seen battle hardened drinkers meet the creator with this surprisingly smooth concoction. Like most Martinis, the liquid should be chilled to sub-zero, which makes the pour a true experience. The viscosity of the liquid changes and you will feel like a true alchemist if done right.",
+    "filename": "The Wet Martini 207ce1fd2e93816da13bc0a81ba98d40.md",
+    "tag": "Classic",
+    "slug": "the-wet-martini"
+  },
+  {
+    "title": "Classic Daiquiri",
+    "ingredients": [
+      "Planteray 3yo Rum: 50ml",
+      "Lime Juice: 20ml",
+      "Sugar Syrup: 15ml"
+    ],
+    "method": "Shake hard with ice and fine strain into a chilled coupette or Nick & Nora.\n",
+    "glassware": "Coupette or Nick & Nora\n",
+    "garnish": "None\n",
+    "pro_tip": "Balance is everything: the sugar and lime should elevate the rum, not hide it. Adjust ratios slightly for guest preference.\n",
+    "did_you_know": "Invented in Cuba and famously favoured by Hemingway, the Daiquiri is a template cocktail \u2014 the basis for countless tropical classics.",
+    "filename": "Classic Daiquiri 207ce1fd2e9381acb618f9f46a09afca.md",
+    "tag": "Uncategorised",
+    "slug": "classic-daiquiri"
+  },
+  {
+    "title": "Reverse Adonis",
+    "ingredients": [
+      "Fino Sherry: 20ml",
+      "Mezcal Verde: 5ml",
+      "Belzasar Rose: 40ml",
+      "Orange Bitters: 1 dash"
+    ],
+    "method": "Shake with ice and fine strain into a chilled N&N.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Grapefruit twist\n",
+    "pro_tip": "Shaking highlights the lighter florals of the ros\u00e9 vermouth and gives the drink a lively texture.\n",
+    "did_you_know": "The original Adonis dates back to the 1880s and was named after a Broadway musical. This version inverts it with a smoky twist.",
+    "filename": "Reverse Adonis 207ce1fd2e93813c85cde1281c53de2f.md",
+    "tag": "House Riff",
+    "slug": "reverse-adonis"
+  },
+  {
+    "title": "Spiced Sour",
+    "ingredients": [
+      "Seedlip Garden: 50ml",
+      "Simple Syrup or Gomme: 15ml",
+      "Lemon: 20ml",
+      "Egg: 20ml"
+    ],
+    "method": "Dry shake, then shake again with ice. Fine strain into a coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Nutmeg dust or lemon twist\n",
+    "pro_tip": "Great non-alcoholic option with all the ceremony of a classic sour. Texture is everything.\n",
+    "did_you_know": "Seedlip was the world\u2019s first distilled non-alcoholic spirit, designed to bring sophistication to alcohol-free options.",
+    "filename": "Spiced Sour 207ce1fd2e9381bc80bccd6b3782f704.md",
+    "tag": "House Riff",
+    "slug": "spiced-sour"
+  },
+  {
+    "title": "Tequila Rhubarb Sour",
+    "ingredients": [
+      "Cazcabel Blanco: 50ml",
+      "Lemon Juice: 20ml",
+      "Rhubarb & Strawberry Cordial: 20ml",
+      "Egg White: 20ml"
+    ],
+    "method": "Reverse dry shake and fine strain into a chilled coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Dash of Angostura on top\n",
+    "pro_tip": "Reverse dry shake ensures maximum foam and tight texture for egg white sours.\n",
+    "did_you_know": "Cazcabel\u2019s earthy agave profile pairs well with sharp fruit like rhubarb, making this a perfect spring menu item. The inspiration for this concoction came, of course, from the Connaught. The craft going into making the cordial is immense but the result is incredible. Also, the side product of making the cordial modifier for this drink makes an incredibly tasty sorbet - which some of you may have enjoyed before ;-)\nThe base of this riff is also very suitable for slushies!",
+    "filename": "Tequila Rhubarb Sour 207ce1fd2e9381819939d4f38d35c91f.md",
+    "tag": "House Riff",
+    "slug": "tequila-rhubarb-sour"
+  },
+  {
+    "title": "Tommy\u2019s Margarita",
+    "ingredients": [
+      "Ocho 8 Tequila: 50ml",
+      "Lime Juice: 25ml",
+      "Agave Syrup: 20ml"
+    ],
+    "method": "Shake vigorously with ice. Fine strain into a rocks glass over fresh ice.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Dehydrated lime wheel or expressed lime zest\n",
+    "pro_tip": "Use fresh lime juice \u2014 bottled alternatives dull the agave\u2019s natural brightness. Shake hard for aeration.\n",
+    "did_you_know": "Tommy\u2019s Margarita replaces triple sec with agave syrup, invented at Tommy\u2019s Mexican Restaurant in San Francisco \u2014 it\u2019s now the global gold standard for a clean Margarita.",
+    "filename": "Tommy\u0393\u00c7\u00d6s Margarita 207ce1fd2e93815aa8e1cae192b04854.md",
+    "tag": "Uncategorised",
+    "slug": "tommys-margarita"
+  },
+  {
+    "title": "The Perfect Manhattan",
+    "ingredients": [
+      "Bulleit Rye: 50ml",
+      "Cocchi Di Torino: 12.5ml",
+      "Dolin Dry Vermouth: 12.5ml",
+      "Angostura Bitters: 2 - 3 dashes"
+    ],
+    "method": "Stir until properly diluted and silky. Julip strain into a chilled coupe.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Maraschino cherry, orange peel aromatised and discarded\n",
+    "pro_tip": "The \u201cPerfect\u201d Manhattan uses both sweet and dry vermouths for a layered profile. Stir carefully to avoid over-dilution. Pour from hight - it adds drama to the process but also aerates the mixture, making it much smoother.\n",
+    "did_you_know": "The Manhattan dates back to 1870s New York \u2014 its rye roots give it a spicy backbone loved by purists. It used to be my go-to just to get to the maraschino cherry as quickly as possible. Now I like to savor the moment and the three sips to get to the cherry. Sometimes two.",
+    "filename": "The Perfect Manhattan 207ce1fd2e93812bb92ce493c0a49cef.md",
+    "tag": "Classic",
+    "slug": "the-perfect-manhattan"
+  },
+  {
+    "title": "French Rubi",
+    "ingredients": [
+      "Martell VS: 25ml",
+      "Rhubarb Cordial: 25ml",
+      "Pastis: 10ml",
+      "Prosecco: 60ml"
+    ],
+    "method": "Build in a wine glass or flute. Stir gently to integrate.\n",
+    "glassware": "Flute or large wine glass\n",
+    "garnish": "Rhubarb ribbon or mint sprig suggested\n",
+    "pro_tip": "If prosecco is too fizzy, stir gently or use a dash of soda to balance. This drink\u2019s success lies in flavour harmony \u2014 not sparkle.\n",
+    "did_you_know": "Pastis (aniseed liqueur) and rhubarb are rarely paired \u2014 this high-concept drink highlights flavour over fizz, making it ideal for staff R&D or special menu drops.",
+    "filename": "French Rubi 207ce1fd2e938163a403f78528abf7d5.md",
+    "tag": "Classic",
+    "slug": "french-rubi"
+  },
+  {
+    "title": "The Old Fashioned",
+    "ingredients": [
+      "Bulleit Bourbon: 50ml",
+      "Brown Sugar Syrup: 15ml",
+      "Ango bitters: 2 dash",
+      "Orange bitters:  1 dash"
+    ],
+    "method": "Stir thoroughly with ice and strain over a single large cube in a rocks glass.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Orange peel\n",
+    "pro_tip": "Use cold, dense ice to control dilution. Brown sugar syrup adds rich depth vs.\u00a0white, squeezing the peel over the drink will release its oils and therefore a distinct aroma into the drink, some gently wipe the rim of the glass with it.\n",
+    "did_you_know": "Dating back to the early 1800s, the Old Fashioned is often cited as the original cocktail.",
+    "filename": "The Old Fashioned 207ce1fd2e93812dba48e47e9ff0f5bc.md",
+    "tag": "Classic",
+    "slug": "the-old-fashioned"
+  },
+  {
+    "title": "Bitters & Smoke",
+    "ingredients": [
+      "Cazcabel Reposado: 25ml",
+      "Cynar: 25ml",
+      "Fernet Branca: 12.5ml",
+      "Mezcal Verde: 12.5ml",
+      "Lime: 20ml"
+    ],
+    "method": "Stir in mixing glass, strain into a chilled Nick & Nora\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Grapefruit twist\n",
+    "pro_tip": "Stirring preserves the integrity of bitters and brings out complexity in smoky elements.\n",
+    "did_you_know": "This modern bitter-sour hybrid balances amaro richness with mezcal\u2019s earthiness \u2014 great for adventurous palates.",
+    "filename": "Bitters & Smoke 207ce1fd2e9381c88d5df27f2fe8b38f.md",
+    "tag": "House Riff",
+    "slug": "bitters-smoke"
+  },
+  {
+    "title": "The Pisco Sour",
+    "ingredients": [
+      "El Gobernador (apricot infused): 50ml",
+      "Lime Juice: 25ml",
+      "Simple Syrup or Gomme: 10ml",
+      "Egg White: 25ml",
+      "Orange Angostura Bitters: 1 dash"
+    ],
+    "method": "Reverse dry shake, then shake with ice and fine strain into a coupette.\n",
+    "glassware": "Coupette\n",
+    "garnish": "Bitters dots or swirl on foam.\n",
+    "pro_tip": "Use a reverse dry shake to maximise foam without over-diluting the pisco, just a swift dash of orange bitters in the tin will make a difference that goes a long way, separating a \u201cclassic classic\u201d into a memory - people will come back for more. Share the love.\n",
+    "did_you_know": "This Peruvian classic dates back to the early 1900s and is a national drink with disputed origin claims - therefore no more details about origins and disputed claims. It is, hands down, one of the most universally loved drinks, by amateurs and connoisseurs alike. It has a degree of boldness but is, simultaneously, surprisingly sophisticated.",
+    "filename": "The Pisco Sour 207ce1fd2e938169bec7c160c89807ab.md",
+    "tag": "Uncategorised",
+    "slug": "the-pisco-sour"
+  },
+  {
+    "title": "Fig Negroni",
+    "ingredients": [
+      "Tanqueray: 25ml",
+      "Campari: 25ml",
+      "Briolette Figue: 5ml",
+      "Cocchi: 20ml",
+      "Cacao Bitters: 2ml"
+    ],
+    "method": "Stir with care over ice. Serve on fresh ice in a rocks glass.\n",
+    "glassware": "Rocks\n",
+    "garnish": "Dehydrated fig (if available) or orange peel\n",
+    "pro_tip": "Balance is key \u2014 the fig liqueur must accent, not overwhelm. Tanqueray\u2019s punchy gin base holds up well.\n",
+    "did_you_know": "Considered a riff on the Negroni, the fig and cocoa combo adds deep complexity. Ideal for guests seeking something adventurous but familiar.",
+    "filename": "Fig Negroni 207ce1fd2e9381d4baebe94345a2c60a.md",
+    "tag": "Non-Alcoholic",
+    "slug": "fig-negroni"
+  },
+  {
+    "title": "Apricot Gin Fizz",
+    "ingredients": [
+      "Portobello Road Gin: 50ml",
+      "Apricot Syrup: 12.5ml",
+      "Lemon Juice: 25ml"
+    ],
+    "method": "Shake with ice and strain into a Collins glass. Top with soda.\n",
+    "glassware": "Collins\n",
+    "garnish": "Lemon slice\n",
+    "pro_tip": "Perfect balance of sweet fruit and bright citrus \u2014 ideal in warm weather.\n",
+    "did_you_know": "This is a twist on the classic Gin Fizz, swapping sugar for fruit syrup for depth and colour.",
+    "filename": "Apricot Gin Fizz 207ce1fd2e9381c68415c70769a136f2.md",
+    "tag": "Non-Alcoholic",
+    "slug": "apricot-gin-fizz"
+  },
+  {
+    "title": "The Martinez",
+    "ingredients": [
+      "Hayman\u2019s Dry Gin: 50ml",
+      "Cocchi Di Torino: 25ml",
+      "Maraschino: 10ml",
+      "Angostura Bitters: 5 dashes"
+    ],
+    "method": "Stir with ice until chilled and balanced. Julep strain into a Nick & Nora.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Lemon twist (+ express and discard orange peel)\n",
+    "pro_tip": "Think of the Martinez as a bridge between a Manhattan and a Martini \u2014 the Maraschino gives it elegant sweetness. Stir with care, if you get a hint of gummy bear you know that you have hit the spot. Some say to add a drop of orange bitters in the ice water when chilling the glass is the key to an outstanding result.\n",
+    "did_you_know": "Widely considered the precursor to the Martini, the Martinez dates back to the mid-1800s and showcases how gin-based cocktails evolved. It is a bold and simultaneously fragile masterpiece. It encapsulates everything that a sweet tooth hates, and everything they love - and vice versa. I would go as far as to say that this particular cocktail made me more curious about cocktails in general. En masse, a great way to endure even the most tedious of company. In moderation, a great way to start an evening. Or finish it.",
+    "filename": "The Martinez 207ce1fd2e93811da7a0f3e2aceeba98.md",
+    "tag": "House Riff",
+    "slug": "the-martinez"
+  },
+  {
+    "title": "The Dry Martini",
+    "ingredients": [
+      "East Ldn Vodka or Gin: 50ml",
+      "Dollin White Vermouth: 10ml"
+    ],
+    "method": "Stir over ice until well chilled, ideally reaching sub-zero temperature. Julep strain from hight into a chilled Nick & Nora or Martini glass. Always ask guest for their spirit preference (vodka or gin).\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "Lemon twist or olive (guest choice)\n",
+    "pro_tip": "Using quality ice and a proper chill on the glass makes a huge difference in clarity and texture.\n",
+    "did_you_know": "The Dry Martini became a symbol of elegance in the 20th century and has hundreds of variations \u2014 including the Dirty, Gibson, and Vesper.",
+    "filename": "The Dry Martini 207ce1fd2e9381aaa71fd299658db966.md",
+    "tag": "Uncategorised",
+    "slug": "the-dry-martini"
+  },
+  {
+    "title": "The Paper Plane",
+    "ingredients": [
+      "Bulleit Bourbon: 25ml",
+      "Aperol: 25ml",
+      "Amaro Averna: 25ml",
+      "Lemon Juice: 25ml"
+    ],
+    "method": "Shake hard with ice and fine strain into a Nick & Nora or coupe.\n",
+    "glassware": "Nick & Nora\n",
+    "garnish": "None or lemon peel, expressed\n",
+    "pro_tip": "Use a tight shake to ensure full integration \u2014 equal parts require perfect balance in acidity and bitterness!\n",
+    "did_you_know": "Created by Sam Ross in 2008, the Paper Plane is modern cocktail royalty, named after the M.I.A. track. Balanced, bitter, and addictive. Get this right, using the right method and impeccable precision and you have people coming back for more.",
+    "filename": "The Paper Plane 207ce1fd2e938150b36ed5a4d2175949.md",
+    "tag": "House Riff",
+    "slug": "the-paper-plane"
+  }
+]
