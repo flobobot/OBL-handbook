@@ -2,96 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cocktail Card Manager</title>
-  <script defer src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    nav {
+      background: #f5f5f5;
+      padding: 1rem 2rem;
+      margin: -2rem -2rem 2rem -2rem;
+    }
+
+    nav a {
+      margin-right: 1.5rem;
+      text-decoration: none;
+      font-weight: bold;
+      color: #000;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 200px;
+    }
+
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .edit-btn {
+      margin-top: 0.5rem;
+      background: #007bff;
+      color: white;
+      padding: 0.4rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .edit-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
-<body class="bg-white text-black px-8 py-6">
-  <!-- Top Navigation -->
-  <nav class="mb-8">
-    <ul class="flex gap-6 text-lg font-semibold">
-      <li><a href="/cocktail-manager.html" class="underline">Cocktails</a></li>
-      <li><a href="/training.html">Training</a></li>
-      <li><a href="/admin.html">Admin</a></li>
-      <li><a href="/login.html">Login</a></li>
-    </ul>
+<body>
+  <nav>
+    <a href="cocktail-manager.html">Cocktails</a>
+    <a href="training.html">Training</a>
+    <a href="admin.html">Admin</a>
+    <a href="login.html">Login</a>
   </nav>
 
-  <h1 class="text-3xl font-bold mb-4">Cocktail Card Manager</h1>
-
-  <!-- Filter and Sort Controls -->
-  <div class="flex flex-wrap gap-4 items-center mb-6">
-    <input
-      id="searchInput"
-      type="text"
-      placeholder="Search cocktails..."
-      class="border border-gray-300 rounded px-4 py-2 w-64"
-    />
-    <select
-      id="sortSelect"
-      class="border border-gray-300 rounded px-4 py-2"
-    >
-      <option value="asc">Sort: A–Z</option>
-      <option value="desc">Sort: Z–A</option>
+  <h1>Cocktail Card Manager</h1>
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search cocktails..." />
+    <select id="sortSelect">
+      <option value="az">Sort: A–Z</option>
+      <option value="za">Sort: Z–A</option>
     </select>
   </div>
 
-  <div id="cocktailList">Loading...</div>
+  <div id="cards">Loading...</div>
 
   <script>
-    async function fetchCocktails() {
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const cardsDiv = document.getElementById('cards');
+
+    let cocktails = [];
+
+    async function loadCocktails() {
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
         const data = await res.json();
-        const cocktails = JSON.parse(data.body);
-        renderCocktails(cocktails);
-
-        document.getElementById("searchInput").addEventListener("input", () => {
-          renderCocktails(cocktails);
-        });
-
-        document.getElementById("sortSelect").addEventListener("change", () => {
-          renderCocktails(cocktails);
-        });
+        cocktails = JSON.parse(data.body);
+        renderCards();
       } catch (err) {
-        console.error("Failed to load cocktails:", err);
-        document.getElementById("cocktailList").textContent = "Error loading cocktails.";
+        console.error(err);
+        cardsDiv.innerHTML = "<p>Error loading cocktails.</p>";
       }
     }
 
-    function renderCocktails(cocktails) {
-      const list = document.getElementById("cocktailList");
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const sortOrder = document.getElementById("sortSelect").value;
+    function renderCards() {
+      const search = searchInput.value.toLowerCase();
+      const sort = sortSelect.value;
 
-      let filtered = cocktails.filter(c =>
-        c.title.toLowerCase().includes(query)
-      );
+      let filtered = cocktails.filter(cocktail => {
+        return (
+          cocktail.title?.toLowerCase().includes(search) ||
+          cocktail.ingredients?.toLowerCase().includes(search) ||
+          cocktail.method?.toLowerCase().includes(search) ||
+          cocktail.pro_tip?.toLowerCase().includes(search) ||
+          cocktail.did_you_know?.toLowerCase().includes(search)
+        );
+      });
 
-      if (sortOrder === "asc") {
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
-      } else {
-        filtered.sort((a, b) => b.title.localeCompare(a.title));
+      filtered.sort((a, b) => {
+        if (sort === "az") return a.title.localeCompare(b.title);
+        else return b.title.localeCompare(a.title);
+      });
+
+      if (filtered.length === 0) {
+        cardsDiv.innerHTML = "<p>No cocktails found.</p>";
+        return;
       }
 
-      list.innerHTML = filtered
-        .map(c => `
-          <div class="border rounded p-4 mb-4 shadow-sm">
-            <h2 class="text-xl font-bold mb-2">${c.title}</h2>
-            <p><strong>Ingredients:</strong> ${c.ingredients}</p>
-            <p><strong>Glassware:</strong> ${c.glassware}</p>
-            <p><strong>Method:</strong> ${c.method}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip}</p>
-            <p><strong>Did You Know:</strong> ${c.did_you_know}</p>
-            <a href="/cocktail-editor.html?slug=${c.slug}">
-              <button class="mt-2 bg-blue-600 text-white px-4 py-1 rounded">Edit</button>
-            </a>
-          </div>
-        `)
-        .join("");
+      cardsDiv.innerHTML = filtered.map(cocktail => `
+        <div class="card">
+          <h3>${cocktail.title}</h3>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+          <p><strong>Method:</strong> ${cocktail.method}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
+          <button class="edit-btn" onclick="editCocktail('${cocktail.slug}')">Edit</button>
+        </div>
+      `).join('');
     }
 
-    fetchCocktails();
+    function editCocktail(slug) {
+      window.location.href = `cocktail-editor.html?slug=${slug}`;
+    }
+
+    searchInput.addEventListener("input", renderCards);
+    sortSelect.addEventListener("change", renderCards);
+
+    loadCocktails();
   </script>
 </body>
 </html>
