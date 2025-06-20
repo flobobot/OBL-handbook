@@ -15,6 +15,12 @@ exports.handler = async function(event, context) {
     }
 
     const dataPath = '/tmp/cocktail_data_backup.json';
+
+    // Ensure the file exists, if not create it
+    if (!fs.existsSync(dataPath)) {
+      fs.writeFileSync(dataPath, '[]', 'utf8');
+    }
+
     const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
     const slug = cocktail.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -27,8 +33,18 @@ exports.handler = async function(event, context) {
     }
 
     fs.writeFileSync(dataPath, JSON.stringify(jsonData, null, 2));
-    return { statusCode: 200, body: JSON.stringify({ message: 'Cocktail updated successfully' }) };
+    console.log(`✅ Saved to ${dataPath}: ${JSON.stringify(cocktail.title)}`);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Cocktail updated successfully' })
+    };
+
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    console.error('Error saving cocktail:', err.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 };
