@@ -2,105 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocktail Card Manager</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>Cocktail Manager</title>
   <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+    }
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+      padding: 1rem;
+      display: flex;
+      gap: 2rem;
+      font-weight: bold;
+    }
+    .active {
+      text-decoration: underline;
+    }
+    .category-group {
+      margin-bottom: 2.5rem;
+    }
+    .category-heading {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.25rem;
+    }
     .card {
-      @apply bg-white shadow-md rounded-xl p-4 mb-4;
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
     }
-    .nav {
-      @apply flex space-x-6 px-6 py-4 bg-gray-100 text-sm font-semibold;
+    .card h3 {
+      margin-top: 0;
     }
-    .nav a {
-      @apply text-gray-800 hover:text-blue-500;
+    input, select {
+      margin-right: 1rem;
+      padding: 0.5rem;
     }
     .error {
-      @apply text-red-600 font-medium;
+      color: red;
+      margin-top: 1rem;
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-  <nav class="nav">
-    <a href="cocktail-manager.html" class="font-bold">Cocktails</a>
-    <a href="training.html">Training</a>
-    <a href="admin.html">Admin</a>
-    <a href="login.html">Login</a>
+<body>
+  <nav>
+    <a href="/cocktail-manager.html" class="active">Cocktails</a>
+    <a href="/training.html">Training</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/login.html">Login</a>
   </nav>
 
-  <div class="max-w-4xl mx-auto mt-6 px-4">
-    <h1 class="text-3xl font-bold mb-4">Cocktail Card Manager</h1>
-
-    <div class="flex flex-wrap items-center mb-4 gap-4">
-      <input type="text" id="search" placeholder="Search cocktails..." class="px-3 py-2 border rounded w-full sm:w-64">
-      <select id="sort" class="px-3 py-2 border rounded">
-        <option value="az">Sort: A–Z</option>
-        <option value="za">Sort: Z–A</option>
-      </select>
-    </div>
-
-    <div id="cocktail-list"></div>
-    <div id="error" class="error mt-4"></div>
+  <h1>Cocktail Card Manager</h1>
+  <div>
+    <input type="text" id="search" placeholder="Search cocktails..." />
+    <select id="sort">
+      <option value="az">Sort: A–Z</option>
+      <option value="za">Sort: Z–A</option>
+    </select>
   </div>
+
+  <div id="cocktailContainer"></div>
+  <div id="error" class="error"></div>
 
   <script>
     async function loadCocktails() {
+      const container = document.getElementById("cocktailContainer");
+      const errorEl = document.getElementById("error");
+      container.innerHTML = "";
+      errorEl.textContent = "";
+
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
-        const raw = await res.json();
+        const data = await res.json();
+        const cocktails = JSON.parse(data.body);
 
-        const cocktails = Array.isArray(raw) ? raw : JSON.parse(raw.body || "[]");
+        // Group by category
+        const grouped = {};
+        cocktails.forEach(c => {
+          const cat = (c.category || "Uncategorised").trim();
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(c);
+        });
 
-        if (!Array.isArray(cocktails)) throw new Error("Data is not an array");
+        const searchInput = document.getElementById("search");
+        const sortSelect = document.getElementById("sort");
 
-        window.originalCocktails = cocktails.map(c => ({
-          ...c,
-          category: typeof c.category === 'string' ? c.category : "Uncategorised"
-        }));
+        function render() {
+          const query = searchInput.value.toLowerCase();
+          const sort = sortSelect.value;
+          container.innerHTML = "";
 
-        renderCards(window.originalCocktails);
+          Object.keys(grouped).sort().forEach(category => {
+            const items = grouped[category]
+              .filter(c => c.title.toLowerCase().includes(query))
+              .sort((a, b) =>
+                sort === "az"
+                  ? a.title.localeCompare(b.title)
+                  : b.title.localeCompare(a.title)
+              );
+
+            if (items.length > 0) {
+              const section = document.createElement("div");
+              section.className = "category-group";
+
+              const heading = document.createElement("div");
+              heading.className = "category-heading";
+              heading.textContent = category;
+              section.appendChild(heading);
+
+              items.forEach(cocktail => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                  <h3>${cocktail.title}</h3>
+                  <p><strong>Ingredients:</strong> ${cocktail.ingredients || ""}</p>
+                  <p><strong>Glassware:</strong> ${cocktail.glassware || ""}</p>
+                  <p><strong>Method:</strong> ${cocktail.method || ""}</p>
+                  <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || ""}</p>
+                  <p><strong>Did You Know:</strong> ${cocktail.did_you_know || ""}</p>
+                  <button onclick="window.location.href='cocktail-editor.html?slug=${cocktail.slug}'">Edit</button>
+                `;
+                section.appendChild(card);
+              });
+
+              container.appendChild(section);
+            }
+          });
+        }
+
+        searchInput.addEventListener("input", render);
+        sortSelect.addEventListener("change", render);
+
+        render();
+
       } catch (err) {
-        document.getElementById("error").textContent = "Error loading cocktail data. Check server logs or Drive file format.";
         console.error("Load error:", err);
+        errorEl.textContent = "Error loading cocktail data. Check server logs or Drive file format.";
       }
     }
-
-    function renderCards(data) {
-      const list = document.getElementById("cocktail-list");
-      list.innerHTML = "";
-      data.forEach(cocktail => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-          <h2 class="text-xl font-semibold">${cocktail.title}</h2>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
-          <p><strong>Method:</strong> ${cocktail.method}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || ""}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || ""}</p>
-          <button onclick="window.location='cocktail-editor.html?slug=${encodeURIComponent(cocktail.slug || cocktail.title.toLowerCase().replace(/\s+/g,'-'))}'" class="mt-2 px-4 py-1 bg-blue-600 text-white rounded">Edit</button>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    document.getElementById("search").addEventListener("input", e => {
-      const query = e.target.value.toLowerCase();
-      const filtered = window.originalCocktails.filter(c =>
-        (c.title || "").toLowerCase().includes(query) ||
-        (c.category || "").toLowerCase().includes(query)
-      );
-      renderCards(filtered);
-    });
-
-    document.getElementById("sort").addEventListener("change", e => {
-      const sorted = [...window.originalCocktails].sort((a, b) => {
-        return e.target.value === "az"
-          ? a.title.localeCompare(b.title)
-          : b.title.localeCompare(a.title);
-      });
-      renderCards(sorted);
-    });
 
     loadCocktails();
   </script>
