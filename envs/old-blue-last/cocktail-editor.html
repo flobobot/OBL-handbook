@@ -3,99 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edit Cocktail</title>
+  <title>Cocktail Card Manager</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 2rem;
-      max-width: 700px;
-      margin: auto;
     }
-    h1 {
-      text-align: center;
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    label {
-      display: block;
-      margin-top: 1rem;
+    .card-title {
+      font-size: 1.25rem;
       font-weight: bold;
+      margin-bottom: 0.5rem;
     }
-    input,
-    textarea {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin-top: 0.25rem;
+    .card-btn {
+      margin-top: 1rem;
     }
-    button {
-      margin-top: 1.5rem;
-      padding: 0.75rem;
-      font-size: 1rem;
-      width: 100%;
-      background-color: black;
+    .edit-button {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      background: #0077cc;
       color: white;
-      border: none;
-      cursor: pointer;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <h1>Edit Cocktail</h1>
-  <form id="editForm">
-    <label>Title<input type="text" id="title" required /></label>
-    <label>Ingredients<textarea id="ingredients"></textarea></label>
-    <label>Glassware<input type="text" id="glassware" /></label>
-    <label>Method<textarea id="method"></textarea></label>
-    <label>Pro Tip<input type="text" id="pro_tip" /></label>
-    <label>Did You Know<input type="text" id="did_you_know" /></label>
-    <button type="submit">Save Cocktail</button>
-  </form>
+  <h1>Cocktail Card Manager</h1>
+  <div id="card-list"></div>
 
   <script>
-    const slug = new URLSearchParams(window.location.search).get("slug");
-    let cocktails = [];
+    async function loadCocktails() {
+      const response = await fetch('/.netlify/functions/load-cocktail-data');
+      const cocktails = await response.json();
+      const container = document.getElementById('card-list');
 
-    async function fetchCocktails() {
-      const res = await fetch("/.netlify/functions/load-cocktail-data");
-      cocktails = await res.json();
-      const cocktail = cocktails.find(c => c.slug === slug);
-      if (!cocktail) {
-        alert("Cocktail not found.");
-        return;
-      }
-      document.getElementById("title").value = cocktail.title;
-      document.getElementById("ingredients").value = cocktail.ingredients;
-      document.getElementById("glassware").value = cocktail.glassware;
-      document.getElementById("method").value = cocktail.method;
-      document.getElementById("pro_tip").value = cocktail.pro_tip;
-      document.getElementById("did_you_know").value = cocktail.did_you_know;
+      cocktails.forEach(cocktail => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="card-title">${cocktail.title}</div>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+          <p><strong>Method:</strong> ${cocktail.method}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
+          <div class="card-btn">
+            <a class="edit-button" href="/cocktail-editor.html?slug=${encodeURIComponent(cocktail.slug)}">Edit</a>
+          </div>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    document.getElementById("editForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const updated = {
-        ...cocktails.find(c => c.slug === slug),
-        title: document.getElementById("title").value,
-        ingredients: document.getElementById("ingredients").value,
-        glassware: document.getElementById("glassware").value,
-        method: document.getElementById("method").value,
-        pro_tip: document.getElementById("pro_tip").value,
-        did_you_know: document.getElementById("did_you_know").value,
-      };
-      const newCocktails = cocktails.map(c => c.slug === slug ? updated : c);
-      const res = await fetch("/.netlify/functions/save-cocktail-data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCocktails)
-      });
-      if (res.ok) {
-        alert("Saved!");
-        window.location.href = "/cocktail-manager.html";
-      } else {
-        alert("Failed to save");
-      }
-    });
-
-    fetchCocktails();
+    loadCocktails();
   </script>
 </body>
 </html>
