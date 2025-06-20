@@ -2,102 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocktail Card Manager</title>
+  <title>Cocktail Manager</title>
   <style>
     body {
-      font-family: sans-serif;
-      margin: 2rem;
-      background: #f8f8f8;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #fafafa;
     }
     nav {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 2rem;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+    nav a {
+      margin-right: 20px;
       font-weight: bold;
-    }
-    a {
       text-decoration: none;
-      color: #333;
+      color: black;
     }
-    a:hover {
-      text-decoration: underline;
+    h1 {
+      font-size: 28px;
     }
     .card {
+      border: 1px solid #ddd;
       background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      padding: 16px;
+      margin-bottom: 12px;
       border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
     }
-    h2 {
-      margin-top: 2rem;
+    .card h3 {
+      margin-top: 0;
     }
-    .title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+    .category {
+      margin-top: 40px;
     }
-    .meta {
-      margin-bottom: 0.5rem;
+    .category h2 {
+      border-bottom: 2px solid #333;
     }
   </style>
 </head>
 <body>
-  <nav>
-    <a href="/cocktail-manager.html">Cocktails</a>
-    <a href="/training.html">Training</a>
-    <a href="/admin.html">Admin</a>
-    <a href="/login.html">Login</a>
-  </nav>
 
-  <h1>Cocktail Card Manager</h1>
-  <div id="cards"></div>
+<nav>
+  <a href="/cocktail-manager.html">Cocktails</a>
+  <a href="/training.html">Training</a>
+  <a href="/admin.html">Admin</a>
+  <a href="/login.html">Login</a>
+</nav>
 
-  <script>
-    const DATA_URL =
-      "https://drive.google.com/uc?export=download&id=1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL";
+<h1>Cocktail Card Manager</h1>
+<div id="content">Loading...</div>
 
-    fetch(DATA_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        const grouped = {};
-        data.forEach((cocktail) => {
-          const category = cocktail.category || "Uncategorised";
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(cocktail);
-        });
+<script>
+  async function loadCocktails() {
+    try {
+      const response = await fetch('/netlify/data/cocktail_data_backup.json');
+      const data = await response.json();
+      renderCocktails(data);
+    } catch (err) {
+      document.getElementById('content').innerHTML = "<p style='color:red;'>Failed to load cocktail data. Please check the file path or format.</p>";
+      console.error(err);
+    }
+  }
 
-        const container = document.getElementById("cards");
+  function renderCocktails(cocktails) {
+    const grouped = {};
+    cocktails.forEach(cocktail => {
+      const tag = (cocktail.tag || 'Uncategorised').trim();
+      if (!grouped[tag]) grouped[tag] = [];
+      grouped[tag].push(cocktail);
+    });
 
-        Object.entries(grouped).forEach(([category, list]) => {
-          const section = document.createElement("section");
-          const heading = document.createElement("h2");
-          heading.textContent = category;
-          section.appendChild(heading);
+    const content = document.getElementById('content');
+    content.innerHTML = '';
 
-          list.forEach((cocktail) => {
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerHTML = `
-              <div class="title">${cocktail.title}</div>
-              <div class="meta"><strong>Ingredients:</strong> ${cocktail.ingredients}</div>
-              <div class="meta"><strong>Glassware:</strong> ${cocktail.glassware}</div>
-              <div class="meta"><strong>Method:</strong> ${cocktail.method}</div>
-              <div class="meta"><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</div>
-              <div class="meta"><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</div>
-            `;
-            section.appendChild(div);
-          });
-
-          container.appendChild(section);
-        });
-      })
-      .catch((err) => {
-        document.getElementById("cards").innerHTML =
-          "<p style='color:red'>Failed to load cocktail data. Please check the Drive link or format.</p>";
-        console.error("Load error:", err);
+    Object.keys(grouped).sort().forEach(tag => {
+      const section = document.createElement('div');
+      section.className = 'category';
+      section.innerHTML = `<h2>${tag}</h2>`;
+      grouped[tag].forEach(cocktail => {
+        section.innerHTML += `
+          <div class="card">
+            <h3>${cocktail.title}</h3>
+            <p><strong>Ingredients:</strong> ${Array.isArray(cocktail.ingredients) ? cocktail.ingredients.join(', ') : cocktail.ingredients}</p>
+            <p><strong>Glassware:</strong> ${cocktail.glassware || '—'}</p>
+            <p><strong>Method:</strong> ${cocktail.method || '—'}</p>
+            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || '—'}</p>
+            <p><strong>Did You Know:</strong> ${cocktail.did_you_know || '—'}</p>
+          </div>
+        `;
       });
-  </script>
+      content.appendChild(section);
+    });
+  }
+
+  loadCocktails();
+</script>
+
 </body>
 </html>
