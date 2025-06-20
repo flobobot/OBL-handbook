@@ -16,6 +16,8 @@
       padding: 1rem;
       margin-bottom: 1.5rem;
       border-radius: 6px;
+      background-color: #fdfdfd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
     .card h3 {
       margin-top: 0;
@@ -35,6 +37,11 @@
     .card button:hover {
       background: #0059c1;
     }
+    #cocktail-list.empty {
+      text-align: center;
+      font-style: italic;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -43,25 +50,38 @@
 
   <script>
     async function fetchCocktails() {
-  const res = await fetch('/.netlify/functions/load-cocktail-data');
-  try {
-    return await res.json(); // Let browser parse it once
-  } catch (err) {
-    console.error('Failed to parse cocktail data from response:', err);
-    return [];
-  }
-}
+      try {
+        const res = await fetch('/.netlify/functions/load-cocktail-data');
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('Data is not an array');
+        return data;
+      } catch (err) {
+        console.error('Error fetching cocktail data:', err);
+        return [];
+      }
+    }
 
     function renderCocktailCard(cocktail) {
+      const {
+        title = 'Untitled',
+        ingredients = '',
+        glassware = '',
+        method = '',
+        pro_tip = '',
+        did_you_know = '',
+        slug = ''
+      } = cocktail;
+
       return `
         <div class="card">
-          <h3>${cocktail.title}</h3>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
-          <p><strong>Method:</strong> ${cocktail.method}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
-          <button onclick="location.href='/cocktail-editor.html?slug=${cocktail.slug}'">Edit</button>
+          <h3>${title}</h3>
+          <p><strong>Ingredients:</strong> ${ingredients}</p>
+          <p><strong>Glassware:</strong> ${glassware}</p>
+          <p><strong>Method:</strong> ${method}</p>
+          <p><strong>Pro Tip:</strong> ${pro_tip}</p>
+          <p><strong>Did You Know:</strong> ${did_you_know}</p>
+          <button onclick="location.href='/cocktail-editor.html?slug=${encodeURIComponent(slug)}'">Edit</button>
         </div>
       `;
     }
@@ -69,7 +89,13 @@
     window.addEventListener('DOMContentLoaded', async () => {
       const container = document.getElementById('cocktail-list');
       const cocktails = await fetchCocktails();
-      container.innerHTML = cocktails.map(renderCocktailCard).join('');
+
+      if (cocktails.length === 0) {
+        container.classList.add('empty');
+        container.textContent = 'No cocktail cards found.';
+      } else {
+        container.innerHTML = cocktails.map(renderCocktailCard).join('');
+      }
     });
   </script>
 </body>
