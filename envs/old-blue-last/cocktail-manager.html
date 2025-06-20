@@ -265,10 +265,10 @@
       closeModal();
 
       try {
-        const res = await fetch('/.netlify/functions/save-cocktail-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(cocktails)
+        const res = await fetch('/.netlify/functions/saveCocktailDrive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cocktails)
         });
 
         if (!res.ok) throw new Error('Failed to save to server');
