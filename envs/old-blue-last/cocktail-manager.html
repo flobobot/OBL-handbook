@@ -3,90 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocktail Manager</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>Cocktail Card Manager</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f5f5f5; color: #222; }
+    nav { margin-bottom: 2rem; }
+    nav a { margin-right: 1.5rem; font-weight: bold; color: #0033cc; text-decoration: none; }
+    h1 { margin-bottom: 1rem; }
+    .controls { margin-bottom: 1.5rem; display: flex; gap: 1rem; }
+    .card { background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card h2 { margin-top: 0; }
+    .error { color: red; font-weight: bold; margin-top: 1rem; }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-  <nav class="bg-white shadow px-4 py-3 mb-4">
-    <ul class="flex space-x-6 font-semibold">
-      <li><a href="cocktail-manager.html" class="text-blue-600 underline">Cocktails</a></li>
-      <li><a href="training.html" class="hover:underline">Training</a></li>
-      <li><a href="admin.html" class="hover:underline">Admin</a></li>
-      <li><a href="login.html" class="hover:underline">Login</a></li>
-    </ul>
+<body>
+  <nav>
+    <a href="cocktail-manager.html">Cocktails</a>
+    <a href="#">Training</a>
+    <a href="#">Admin</a>
+    <a href="#">Login</a>
   </nav>
 
-  <main class="max-w-4xl mx-auto px-4">
-    <h1 class="text-3xl font-bold mb-4">Cocktail Card Manager</h1>
-    <div class="flex items-center mb-4 space-x-4">
-      <input id="search" type="text" placeholder="Search cocktails..." class="border border-gray-300 px-3 py-1 rounded w-full max-w-xs">
-      <select id="sort" class="border border-gray-300 px-2 py-1 rounded">
-        <option value="az">Sort: A–Z</option>
-        <option value="za">Sort: Z–A</option>
-      </select>
-    </div>
-    <div id="cocktail-container" class="space-y-4"></div>
-    <p id="error" class="text-red-600 font-semibold mt-4 hidden"></p>
-  </main>
+  <h1>Cocktail Card Manager</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search cocktails..." />
+    <select id="sortSelect">
+      <option value="az">Sort: A–Z</option>
+      <option value="za">Sort: Z–A</option>
+    </select>
+  </div>
+
+  <div id="cocktailContainer"></div>
+  <div class="error" id="error"></div>
 
   <script>
     async function loadCocktails() {
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
-        const json = await res.json();
-        const raw = json.body;
-        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-        if (!Array.isArray(parsed)) throw new Error("Cocktail data is not an array");
+        const { body } = await res.json();
+        const cocktails = JSON.parse(body);
 
-        const grouped = {};
-        for (const c of parsed) {
-          const cat = c.category?.trim() || "Uncategorised";
-          if (!grouped[cat]) grouped[cat] = [];
-          grouped[cat].push(c);
-        }
+        if (!Array.isArray(cocktails)) throw new Error("Cocktail data is not an array");
 
-        renderCards(grouped);
+        window.allCocktails = cocktails;
+        renderCocktails(cocktails);
       } catch (err) {
-        document.getElementById("error").classList.remove("hidden");
         document.getElementById("error").textContent = "Error loading cocktail data. Check server logs or Drive file format.";
         console.error("Load error:", err);
       }
     }
 
-    function renderCards(grouped) {
-      const container = document.getElementById("cocktail-container");
+    function renderCocktails(data) {
+      const container = document.getElementById("cocktailContainer");
       container.innerHTML = "";
-      const search = document.getElementById("search").value.toLowerCase();
-      const sort = document.getElementById("sort").value;
 
-      Object.keys(grouped).sort().forEach(cat => {
-        const title = document.createElement("h2");
-        title.className = "text-xl font-bold mt-6";
-        title.textContent = cat;
-        container.appendChild(title);
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const sortOrder = document.getElementById("sortSelect").value;
 
-        let cards = grouped[cat].filter(c => c.title?.toLowerCase().includes(search));
-        cards.sort((a, b) => sort === "az" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+      let filtered = data.filter(cocktail => cocktail.title && cocktail.title.toLowerCase().includes(query));
+      filtered.sort((a, b) => {
+        if (!a.title || !b.title) return 0;
+        return sortOrder === "az"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      });
 
-        for (const c of cards) {
-          const card = document.createElement("div");
-          card.className = "border rounded p-4 shadow bg-white";
-          card.innerHTML = `
-            <h3 class="text-lg font-bold mb-2">${c.title}</h3>
-            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients || "—"}</p>
-            <p><strong>Glassware:</strong> ${c.glassware || "—"}</p>
-            <p><strong>Method:</strong> ${c.method || "—"}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip || "—"}</p>
-            <p><strong>Did You Know:</strong> ${c.did_you_know || "—"}</p>
-            <a href="cocktail-editor.html?slug=${c.slug}" class="mt-2 inline-block text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Edit</a>
-          `;
-          container.appendChild(card);
-        }
+      filtered.forEach(cocktail => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h2>${cocktail.title || "Untitled Cocktail"}</h2>
+          <p><strong>Ingredients:</strong> ${Array.isArray(cocktail.ingredients) ? cocktail.ingredients.join(", ") : "-"}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware || "-"}</p>
+          <p><strong>Method:</strong> ${cocktail.method || "-"}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</p>
+          <a href="cocktail-editor.html?slug=${encodeURIComponent((cocktail.title || "").toLowerCase().replace(/\s+/g, '-'))}">Edit</a>
+        `;
+        container.appendChild(div);
       });
     }
 
-    document.getElementById("search").addEventListener("input", loadCocktails);
-    document.getElementById("sort").addEventListener("change", loadCocktails);
+    document.getElementById("searchInput").addEventListener("input", () => renderCocktails(window.allCocktails));
+    document.getElementById("sortSelect").addEventListener("change", () => renderCocktails(window.allCocktails));
+
     loadCocktails();
   </script>
 </body>
