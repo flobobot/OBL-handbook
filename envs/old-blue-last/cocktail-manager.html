@@ -2,173 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cocktail Card Manager</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 2rem;
-    }
-    nav {
-      background: #f5f5f5;
-      padding: 1rem 2rem;
-      margin: -2rem -2rem 2rem -2rem;
-    }
-    nav a {
-      margin-right: 1.5rem;
-      text-decoration: none;
-      font-weight: bold;
-      color: #000;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    input[type="text"], select {
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-    .category-group {
-      margin-bottom: 2rem;
-    }
-    .category-group h2 {
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 0.3rem;
-      margin-bottom: 1rem;
-    }
-    .card {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .edit-btn {
-      margin-top: 0.5rem;
-      background: #007bff;
-      color: white;
-      padding: 0.4rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .edit-btn:hover {
-      background-color: #0056b3;
-    }
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    nav { display: flex; background: #fff; padding: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    nav a { margin-right: 1em; text-decoration: none; font-weight: bold; color: black; }
+    nav a.active { text-decoration: underline; }
+    .container { padding: 2em; max-width: 900px; margin: auto; }
+    .card { background: white; border-radius: 8px; padding: 1em; margin-bottom: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .controls { display: flex; gap: 1em; margin-bottom: 1em; }
+    input, select { padding: 0.5em; border-radius: 4px; border: 1px solid #ccc; }
+    button { padding: 0.4em 0.8em; border: none; border-radius: 4px; background: black; color: white; cursor: pointer; }
+    .error { color: red; }
   </style>
 </head>
 <body>
   <nav>
-    <a href="cocktail-manager.html">Cocktails</a>
-    <a href="training.html">Training</a>
-    <a href="admin.html">Admin</a>
-    <a href="login.html">Login</a>
+    <a href="/cocktail-manager.html" class="active">Cocktails</a>
+    <a href="/training.html">Training</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/login.html">Login</a>
   </nav>
-
-  <h1>Cocktail Card Manager</h1>
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search cocktails..." />
-    <select id="sortSelect">
-      <option value="az">Sort: A–Z</option>
-      <option value="za">Sort: Z–A</option>
-    </select>
+  <div class="container">
+    <h1>Cocktail Card Manager</h1>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="Search cocktails..." />
+      <select id="sortSelect">
+        <option value="az">Sort: A–Z</option>
+        <option value="za">Sort: Z–A</option>
+      </select>
+    </div>
+    <div id="cardContainer"></div>
+    <p class="error" id="error"></p>
   </div>
 
-  <div id="cards">Loading...</div>
-
   <script>
-    const searchInput = document.getElementById("searchInput");
-    const sortSelect = document.getElementById("sortSelect");
-    const cardsDiv = document.getElementById("cards");
-
-    let cocktails = [];
-
     async function loadCocktails() {
       try {
         const res = await fetch("/.netlify/functions/load-cocktail-data");
-        if (!res.ok) throw new Error("Failed to fetch cocktail data");
-        const data = await res.json();
-
-        if (!Array.isArray(data)) throw new Error("Data is not an array");
-        cocktails = data;
-        renderCards();
+        const raw = await res.json();
+        const cocktails = JSON.parse(raw.body);
+        renderCards(cocktails);
       } catch (err) {
-        console.error("Error loading cocktails:", err);
-        cardsDiv.innerHTML = "<p style='color:red;'>Error loading cocktail data. Check server logs or Drive file format.</p>";
+        document.getElementById("error").textContent = "Error loading cocktail data. Check server logs or Drive file format.";
+        console.error("Load error:", err);
       }
     }
 
-    function groupByCategory(cocktailArray) {
-      return cocktailArray.reduce((groups, cocktail) => {
-        const category = cocktail.category?.trim() || "Uncategorised";
-        if (!groups[category]) groups[category] = [];
-        groups[category].push(cocktail);
-        return groups;
-      }, {});
-    }
+    function renderCards(data) {
+      const container = document.getElementById("cardContainer");
+      const searchInput = document.getElementById("searchInput");
+      const sortSelect = document.getElementById("sortSelect");
 
-    function renderCards() {
-      const search = searchInput.value.toLowerCase();
-      const sort = sortSelect.value;
-
-      let filtered = cocktails.filter(cocktail => {
-        const text = [
-          cocktail.title,
-          cocktail.ingredients,
-          cocktail.method,
-          cocktail.pro_tip,
-          cocktail.did_you_know,
-          cocktail.category
-        ].map(val => val?.toLowerCase() || "").join(" ");
-        return text.includes(search);
-      });
-
-      filtered.sort((a, b) => {
-        const tA = a.title || "";
-        const tB = b.title || "";
-        return sort === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
-      });
-
-      const grouped = groupByCategory(filtered);
-
-      if (filtered.length === 0) {
-        cardsDiv.innerHTML = "<p>No cocktails found.</p>";
-        return;
+      function display(filtered) {
+        container.innerHTML = "";
+        if (filtered.length === 0) {
+          container.innerHTML = "<p>No matching cocktails.</p>";
+          return;
+        }
+        filtered.forEach(cocktail => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <h3>${cocktail.title}</h3>
+            <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
+            <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+            <p><strong>Method:</strong> ${cocktail.method}</p>
+            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
+            <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
+            <button onclick="window.location.href='/cocktail-editor.html?slug=${encodeURIComponent(cocktail.slug)}'">Edit</button>
+          `;
+          container.appendChild(card);
+        });
       }
 
-      cardsDiv.innerHTML = Object.entries(grouped).map(([category, items]) => `
-        <div class="category-group">
-          <h2>${category}</h2>
-          ${items.map(c => `
-            <div class="card">
-              <h3>${c.title || "Untitled Cocktail"}</h3>
-              <p><strong>Ingredients:</strong> ${c.ingredients || "-"}</p>
-              <p><strong>Glassware:</strong> ${c.glassware || "-"}</p>
-              <p><strong>Method:</strong> ${c.method || "-"}</p>
-              <p><strong>Pro Tip:</strong> ${c.pro_tip || "-"}</p>
-              <p><strong>Did You Know:</strong> ${c.did_you_know || "-"}</p>
-              <button class="edit-btn" onclick="editCocktail('${c.slug}')">Edit</button>
-            </div>
-          `).join("")}
-        </div>
-      `).join("");
-    }
-
-    function editCocktail(slug) {
-      if (!slug) {
-        alert("No slug found for this cocktail.");
-        return;
+      function applyFilters() {
+        const search = searchInput.value.toLowerCase();
+        const sort = sortSelect.value;
+        let filtered = data.filter(cocktail => {
+          const text = [
+            cocktail.title,
+            cocktail.ingredients,
+            cocktail.method,
+            cocktail.pro_tip,
+            cocktail.did_you_know,
+            cocktail.category
+          ].map(val => (val || "").toString().toLowerCase()).join(" ");
+          return text.includes(search);
+        });
+        filtered.sort((a, b) => {
+          const tA = a.title.toLowerCase();
+          const tB = b.title.toLowerCase();
+          return sort === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
+        });
+        display(filtered);
       }
-      window.location.href = `cocktail-editor.html?slug=${slug}`;
-    }
 
-    searchInput.addEventListener("input", renderCards);
-    sortSelect.addEventListener("change", renderCards);
+      searchInput.addEventListener("input", applyFilters);
+      sortSelect.addEventListener("change", applyFilters);
+      applyFilters();
+    }
 
     loadCocktails();
   </script>
