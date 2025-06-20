@@ -1,57 +1,48 @@
 const { google } = require('googleapis');
+const path = require('path');
+const fs = require('fs');
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
   try {
-    // Retrieve base64-encoded credentials from environment variable
-    const base64Credentials = process.env.GOOGLE_CREDENTIALS_BASE64;
+    // 1. Load credentials
+    const credentialsPath = path.resolve(__dirname, 'flobocorp-automation-cac461eb14c1.json');
+    const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
-    if (!base64Credentials) {
-      return {
-        statusCode: 500,
-        body: 'Missing environment variable: GOOGLE_CREDENTIALS_BASE64',
-      };
-    }
-
-    // Decode base64 and parse the service account JSON
-    const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
-    let credentials;
-    try {
-      credentials = JSON.parse(decoded);
-    } catch (err) {
-      return {
-        statusCode: 500,
-        body: `Invalid JSON in GOOGLE_CREDENTIALS_BASE64: ${err.message}`,
-      };
-    }
-
+    // 2. Authenticate using service account
     const auth = new google.auth.GoogleAuth({
       credentials,
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      scopes: ['https://www.googleapis.com/auth/drive.readonly']
     });
 
     const drive = google.drive({ version: 'v3', auth });
 
-    // ID of the JSON file stored in Google Drive
-    const FILE_ID = '1OaVR6OhtCFJ1GV-Td2P9WB5VLczMCOK0'; // ← replace if needed
+    // 3. Define the file ID to fetch from Google Drive
+    const fileId = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL';
 
-    // Fetch file contents
-    const result = await drive.files.get({
-      fileId: FILE_ID,
-      alt: 'media',
+    // 4. Download file content
+    const res = await drive.files.get({
+      fileId,
+      alt: 'media'
+    }, { responseType: 'stream' });
+
+    let rawData = '';
+    await new Promise((resolve, reject) => {
+      res.data
+        .on('data', chunk => rawData += chunk)
+        .on('end', resolve)
+        .on('error', reject);
     });
 
-    // Respond with contents
+    const cocktailData = JSON.parse(rawData);
+
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(result.data),
+      body: JSON.stringify(cocktailData)
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: `Failed to load cocktail data: ${err.message}`,
+      body: `Failed to load cocktail data: ${err.message}`
     };
   }
 };
