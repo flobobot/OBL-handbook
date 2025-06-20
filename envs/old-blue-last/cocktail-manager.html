@@ -7,74 +7,85 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50 text-gray-900">
-  <nav class="bg-white border-b border-gray-200 px-4 py-3 mb-4">
-    <div class="flex space-x-6 font-semibold">
-      <a href="/cocktail-manager.html" class="text-blue-600 underline">Cocktails</a>
-      <a href="#" class="hover:underline">Training</a>
-      <a href="#" class="hover:underline">Admin</a>
-      <a href="#" class="hover:underline">Login</a>
-    </div>
+  <nav class="bg-white shadow px-4 py-3 mb-4">
+    <ul class="flex space-x-6 font-semibold">
+      <li><a href="cocktail-manager.html" class="text-blue-600 underline">Cocktails</a></li>
+      <li><a href="training.html" class="hover:underline">Training</a></li>
+      <li><a href="admin.html" class="hover:underline">Admin</a></li>
+      <li><a href="login.html" class="hover:underline">Login</a></li>
+    </ul>
   </nav>
 
-  <div class="max-w-4xl mx-auto px-4">
-    <h1 class="text-2xl font-bold mb-4">Cocktail Card Manager</h1>
-    <div class="flex flex-wrap gap-2 items-center mb-4">
-      <input id="search" type="text" placeholder="Search cocktails..." class="border rounded px-3 py-1 w-60">
-      <select id="sort" class="border rounded px-2 py-1">
+  <main class="max-w-4xl mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-4">Cocktail Card Manager</h1>
+    <div class="flex items-center mb-4 space-x-4">
+      <input id="search" type="text" placeholder="Search cocktails..." class="border border-gray-300 px-3 py-1 rounded w-full max-w-xs">
+      <select id="sort" class="border border-gray-300 px-2 py-1 rounded">
         <option value="az">Sort: A–Z</option>
         <option value="za">Sort: Z–A</option>
       </select>
     </div>
-    <div id="cards" class="space-y-4"></div>
-    <p id="error" class="text-red-600 mt-4 hidden">Error loading cocktail data. Check server logs or Drive file format.</p>
-  </div>
+    <div id="cocktail-container" class="space-y-4"></div>
+    <p id="error" class="text-red-600 font-semibold mt-4 hidden"></p>
+  </main>
 
   <script>
     async function loadCocktails() {
       try {
-        const res = await fetch("/.netlify/functions/load-cocktail-data")
-        const result = await res.json()
-        const data = JSON.parse(result.body)
+        const res = await fetch("/.netlify/functions/load-cocktail-data");
+        const json = await res.json();
+        const cocktails = JSON.parse(json.body);
 
-        if (!Array.isArray(data)) throw new Error("Invalid data array")
+        const grouped = {};
+        for (const cocktail of cocktails) {
+          const category = cocktail.category?.trim() || "Uncategorised";
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(cocktail);
+        }
 
-        const container = document.getElementById("cards")
-        const errorMsg = document.getElementById("error")
-
-        // Sort
-        const sortOrder = document.getElementById("sort").value
-        data.sort((a, b) => {
-          const nameA = a.title?.toLowerCase?.() || ""
-          const nameB = b.title?.toLowerCase?.() || ""
-          return sortOrder === "az" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
-        })
-
-        // Render
-        const query = document.getElementById("search").value.toLowerCase()
-        const filtered = data.filter(c => c.title?.toLowerCase().includes(query))
-
-        container.innerHTML = filtered.map(c => `
-          <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-bold mb-2">${c.title || "Untitled Cocktail"}</h2>
-            <p><strong>Ingredients:</strong> ${c.ingredients || "N/A"}</p>
-            <p><strong>Glassware:</strong> ${c.glassware || "N/A"}</p>
-            <p><strong>Method:</strong> ${c.method || "N/A"}</p>
-            <p><strong>Pro Tip:</strong> ${c.pro_tip || "N/A"}</p>
-            <p><strong>Did You Know:</strong> ${c.did_you_know || "N/A"}</p>
-            <a href="/cocktail-editor.html?slug=${c.slug || ""}" class="mt-2 inline-block px-3 py-1 bg-blue-600 text-white rounded">Edit</a>
-          </div>
-        `).join("")
-
-        errorMsg.classList.add("hidden")
+        renderCards(grouped);
       } catch (err) {
-        document.getElementById("error").classList.remove("hidden")
-        console.error("Load error:", err)
+        document.getElementById("error").classList.remove("hidden");
+        document.getElementById("error").textContent = "Error loading cocktail data. Check server logs or Drive file format.";
+        console.error("Load error:", err);
       }
     }
 
-    document.getElementById("search").addEventListener("input", loadCocktails)
-    document.getElementById("sort").addEventListener("change", loadCocktails)
-    window.addEventListener("DOMContentLoaded", loadCocktails)
+    function renderCards(grouped) {
+      const container = document.getElementById("cocktail-container");
+      container.innerHTML = "";
+      const search = document.getElementById("search").value.toLowerCase();
+      const sort = document.getElementById("sort").value;
+
+      Object.keys(grouped).sort().forEach(cat => {
+        const title = document.createElement("h2");
+        title.className = "text-xl font-bold mt-6";
+        title.textContent = cat;
+        container.appendChild(title);
+
+        let cards = grouped[cat].filter(c => c.title.toLowerCase().includes(search));
+        cards.sort((a, b) => sort === "az" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+
+        for (const c of cards) {
+          const card = document.createElement("div");
+          card.className = "border rounded p-4 shadow bg-white";
+          card.innerHTML = `
+            <h3 class="text-lg font-bold mb-2">${c.title}</h3>
+            <p><strong>Ingredients:</strong> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}</p>
+            <p><strong>Glassware:</strong> ${c.glassware}</p>
+            <p><strong>Method:</strong> ${c.method}</p>
+            <p><strong>Pro Tip:</strong> ${c.pro_tip}</p>
+            <p><strong>Did You Know:</strong> ${c.did_you_know}</p>
+            <a href="cocktail-editor.html?slug=${c.slug}" class="mt-2 inline-block text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Edit</a>
+          `;
+          container.appendChild(card);
+        }
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", loadCocktails);
+    document.getElementById("sort").addEventListener("change", loadCocktails);
+    loadCocktails();
   </script>
 </body>
 </html>
