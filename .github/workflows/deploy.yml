@@ -1,11 +1,11 @@
+name: Manual Trigger Test
+
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'envs/**'
-      - 'core-components/**'
-      - 'patches/**'
-      - '.github/workflows/deploy.yml'
-      - 'trigger-ci.txt'
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "✅ Hello! Manual trigger is working."
