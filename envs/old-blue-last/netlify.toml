@@ -1,8 +1,8 @@
 [build]
   publish = "envs/old-blue-last"
-  functions = "envs/old-blue-last/netlify/functions"
 
 [functions]
+  directory = "netlify/functions"
   node_bundler = "esbuild"
 
 [[redirects]]
