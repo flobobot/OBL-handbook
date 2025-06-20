@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Cocktail Manager</title>
   <style>
     body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 2rem; }
@@ -17,12 +17,12 @@
 
   <h2 id="form-title">Add New Cocktail</h2>
   <form id="cocktail-form">
-    <input type="text" id="title" placeholder="Title" required>
+    <input type="text" id="title" placeholder="Title" required />
     <textarea id="ingredients" placeholder="Ingredients" required></textarea>
-    <input type="text" id="glassware" placeholder="Glassware">
+    <input type="text" id="glassware" placeholder="Glassware" />
     <textarea id="method" placeholder="Method"></textarea>
-    <input type="text" id="proTip" placeholder="Pro Tip">
-    <input type="text" id="didYouKnow" placeholder="Did You Know">
+    <input type="text" id="proTip" placeholder="Pro Tip" />
+    <input type="text" id="didYouKnow" placeholder="Did You Know" />
     <button type="submit">Save</button>
   </form>
 
@@ -32,11 +32,13 @@
 
     async function fetchCocktails() {
       try {
-        const res = await fetch('/cocktail_data_backup.json');
-        cocktails = await res.json();
+        const res = await fetch('/.netlify/functions/load-cocktail-data');
+        const data = await res.json();
+        cocktails = Array.isArray(data) ? data : [];
         renderCocktails();
       } catch (err) {
-        console.error('Failed to load cocktails:', err);
+        console.error('❌ Failed to load cocktails:', err);
+        cocktails = [];
       }
     }
 
@@ -72,7 +74,7 @@
     }
 
     function deleteCocktail(index) {
-      if (confirm("Delete this cocktail?")) {
+      if (confirm('Delete this cocktail?')) {
         cocktails.splice(index, 1);
         saveCocktails();
       }
@@ -103,13 +105,13 @@
 
     async function saveCocktails() {
       try {
-        const res = await fetch('/.netlify/functions/saveCocktailDrive', {
+        const res = await fetch('/.netlify/functions/save-cocktail-drive', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username: 'florian',
             password: '280984',
-            cocktail: cocktails[cocktails.length - 1]
+            data: cocktails
           })
         });
         const result = await res.json();
