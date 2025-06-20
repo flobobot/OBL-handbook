@@ -1,16 +1,28 @@
 const { google } = require('googleapis');
 
 exports.handler = async function (event, context) {
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      body: 'Method Not Allowed',
-    };
-  }
-
   try {
-    // Parse credentials from environment variable
-    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+    // Retrieve base64-encoded credentials from environment variable
+    const base64Credentials = process.env.GOOGLE_CREDENTIALS_BASE64;
+
+    if (!base64Credentials) {
+      return {
+        statusCode: 500,
+        body: 'Missing environment variable: GOOGLE_CREDENTIALS_BASE64',
+      };
+    }
+
+    // Decode base64 and parse the service account JSON
+    const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
+    let credentials;
+    try {
+      credentials = JSON.parse(decoded);
+    } catch (err) {
+      return {
+        statusCode: 500,
+        body: `Invalid JSON in GOOGLE_CREDENTIALS_BASE64: ${err.message}`,
+      };
+    }
 
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -19,29 +31,22 @@ exports.handler = async function (event, context) {
 
     const drive = google.drive({ version: 'v3', auth });
 
-    // Replace with the actual file ID of your cocktail_data_backup.json
-    const fileId = '1ZB1ddghCaKwh4yNdEU8HRGo3ZV8rHkX9';
+    // ID of the JSON file stored in Google Drive
+    const FILE_ID = '1OaVR6OhtCFJ1GV-Td2P9WB5VLczMCOK0'; // ← replace if needed
 
-    const res = await drive.files.get(
-      {
-        fileId,
-        alt: 'media',
-      },
-      { responseType: 'stream' }
-    );
-
-    let data = '';
-    await new Promise((resolve, reject) => {
-      res.data
-        .on('data', (chunk) => (data += chunk))
-        .on('end', resolve)
-        .on('error', reject);
+    // Fetch file contents
+    const result = await drive.files.get({
+      fileId: FILE_ID,
+      alt: 'media',
     });
 
+    // Respond with contents
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: data,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(result.data),
     };
   } catch (err) {
     return {
