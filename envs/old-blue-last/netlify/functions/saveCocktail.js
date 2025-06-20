@@ -14,7 +14,7 @@ exports.handler = async function(event, context) {
       return { statusCode: 403, body: 'Unauthorized' };
     }
 
-    const dataPath = path.resolve(__dirname, '../../data/cocktail_data_backup.json');
+    const dataPath = '/tmp/cocktail_data_backup.json';
     const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
     const slug = cocktail.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
