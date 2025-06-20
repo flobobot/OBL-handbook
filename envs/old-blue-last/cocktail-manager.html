@@ -7,69 +7,66 @@
   <style>
     body {
       font-family: sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
       padding: 2rem;
-      background: #f9f9f9;
+      max-width: 800px;
+      margin: auto;
     }
-    h1 {
-      font-size: 2rem;
-      text-align: center;
-    }
-    .cocktail-card {
+    .card {
       border: 1px solid #ccc;
-      background: #fff;
-      border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1.5rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 6px;
     }
-    .cocktail-card h2 {
+    .card h3 {
       margin-top: 0;
-      color: #333;
     }
-    .cocktail-card p {
-      margin: 0.4rem 0;
-      color: #555;
+    .card p {
+      margin: 0.5rem 0;
+    }
+    .card button {
+      background: #0070f3;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      border-radius: 4px;
+    }
+    .card button:hover {
+      background: #0059c1;
     }
   </style>
 </head>
 <body>
   <h1>Cocktail Card Manager</h1>
-  <div id="cocktail-list">Loading cocktails...</div>
+  <div id="cocktail-list">Loading...</div>
 
   <script>
-    async function loadCocktails() {
-      try {
-        const response = await fetch("/.netlify/functions/load-cocktail-data");
-        if (!response.ok) throw new Error("Fetch failed");
-
-        const cocktails = await response.json();
-        const container = document.getElementById("cocktail-list");
-        container.innerHTML = "";
-
-        cocktails.forEach(cocktail => {
-          const card = document.createElement("div");
-          card.className = "cocktail-card";
-
-          card.innerHTML = `
-            <h2>${cocktail.title}</h2>
-            <p><strong>Ingredients:</strong> ${cocktail.ingredients || "N/A"}</p>
-            <p><strong>Glassware:</strong> ${cocktail.glassware || "N/A"}</p>
-            <p><strong>Method:</strong> ${cocktail.method || "N/A"}</p>
-            <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "-"}</p>
-            <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "-"}</p>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        const errorMsg = "⚠️ Failed to load cocktail data. Please check your serverless function or console logs.";
-        document.getElementById("cocktail-list").innerText = errorMsg;
-        console.error(err);
-      }
+    async function fetchCocktails() {
+      const res = await fetch('/.netlify/functions/load-cocktail-data');
+      const data = await res.json();
+      return JSON.parse(data.body);
     }
 
-    loadCocktails();
+    function renderCocktailCard(cocktail) {
+      return `
+        <div class="card">
+          <h3>${cocktail.title}</h3>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+          <p><strong>Method:</strong> ${cocktail.method}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know}</p>
+          <button onclick="location.href='/cocktail-editor.html?slug=${cocktail.slug}'">Edit</button>
+        </div>
+      `;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('cocktail-list');
+      const cocktails = await fetchCocktails();
+      container.innerHTML = cocktails.map(renderCocktailCard).join('');
+    });
   </script>
 </body>
 </html>
