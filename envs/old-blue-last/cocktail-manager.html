@@ -33,6 +33,14 @@
       padding: 0.5rem;
       font-size: 1rem;
     }
+    .category-group {
+      margin-bottom: 2rem;
+    }
+    .category-group h2 {
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.3rem;
+      margin-bottom: 1rem;
+    }
     .card {
       border: 1px solid #ccc;
       padding: 1rem;
@@ -95,14 +103,28 @@
       }
     }
 
+    function groupByCategory(cocktailArray) {
+      return cocktailArray.reduce((groups, cocktail) => {
+        const category = cocktail.category?.trim() || "Uncategorised";
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(cocktail);
+        return groups;
+      }, {});
+    }
+
     function renderCards() {
       const search = searchInput.value.toLowerCase();
       const sort = sortSelect.value;
 
       let filtered = cocktails.filter(cocktail => {
-        const text = [cocktail.title, cocktail.ingredients, cocktail.method, cocktail.pro_tip, cocktail.did_you_know]
-          .map(val => val?.toLowerCase() || "")
-          .join(" ");
+        const text = [
+          cocktail.title,
+          cocktail.ingredients,
+          cocktail.method,
+          cocktail.pro_tip,
+          cocktail.did_you_know,
+          cocktail.category
+        ].map(val => val?.toLowerCase() || "").join(" ");
         return text.includes(search);
       });
 
@@ -112,20 +134,27 @@
         return sort === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
       });
 
+      const grouped = groupByCategory(filtered);
+
       if (filtered.length === 0) {
         cardsDiv.innerHTML = "<p>No cocktails found.</p>";
         return;
       }
 
-      cardsDiv.innerHTML = filtered.map(c => `
-        <div class="card">
-          <h3>${c.title || "Untitled Cocktail"}</h3>
-          <p><strong>Ingredients:</strong> ${c.ingredients || "-"}</p>
-          <p><strong>Glassware:</strong> ${c.glassware || "-"}</p>
-          <p><strong>Method:</strong> ${c.method || "-"}</p>
-          <p><strong>Pro Tip:</strong> ${c.pro_tip || "-"}</p>
-          <p><strong>Did You Know:</strong> ${c.did_you_know || "-"}</p>
-          <button class="edit-btn" onclick="editCocktail('${c.slug}')">Edit</button>
+      cardsDiv.innerHTML = Object.entries(grouped).map(([category, items]) => `
+        <div class="category-group">
+          <h2>${category}</h2>
+          ${items.map(c => `
+            <div class="card">
+              <h3>${c.title || "Untitled Cocktail"}</h3>
+              <p><strong>Ingredients:</strong> ${c.ingredients || "-"}</p>
+              <p><strong>Glassware:</strong> ${c.glassware || "-"}</p>
+              <p><strong>Method:</strong> ${c.method || "-"}</p>
+              <p><strong>Pro Tip:</strong> ${c.pro_tip || "-"}</p>
+              <p><strong>Did You Know:</strong> ${c.did_you_know || "-"}</p>
+              <button class="edit-btn" onclick="editCocktail('${c.slug}')">Edit</button>
+            </div>
+          `).join("")}
         </div>
       `).join("");
     }
