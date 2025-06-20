@@ -1,92 +1,125 @@
+<!-- Full Step 2 Code with Tag Filter -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Old Blue Last Cocktail Manager</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f5f5f5;
       margin: 0;
-      padding: 0;
-      background: #f8f8f8;
+      padding: 0 2rem;
     }
-    nav {
+    header {
       background: #111;
-      padding: 12px 24px;
+      color: #fff;
+      padding: 1rem 2rem;
       display: flex;
-      gap: 20px;
+      gap: 2rem;
     }
-    nav a {
+    header a {
       color: white;
       text-decoration: none;
       font-weight: bold;
     }
-    .container {
-      padding: 32px;
+    h1 {
+      margin-top: 2rem;
+    }
+    .controls {
+      margin: 1rem 0;
+      display: flex;
+      gap: 1rem;
     }
     .card {
       background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
       border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .card h2 {
-      margin-top: 0;
-    }
-    .field-label {
-      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .error {
       color: red;
-      margin-top: 20px;
+      font-weight: bold;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
-  <nav>
+  <header>
     <a href="/cocktail-manager.html">Cocktails</a>
     <a href="/training.html">Training</a>
     <a href="/admin.html">Admin</a>
     <a href="/login.html">Login</a>
-  </nav>
+  </header>
 
-  <div class="container">
-    <h1>Old Blue Last Cocktail Manager</h1>
-    <div id="cocktail-list">Loading...</div>
+  <h1>Old Blue Last Cocktail Manager</h1>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search cocktails...">
+    <select id="filter">
+      <option value="All">All Tags</option>
+      <option value="Classic">Classic</option>
+      <option value="House Riff">House Riff</option>
+      <option value="Non-Alcoholic">Non-Alcoholic</option>
+      <option value="Uncategorised">Uncategorised</option>
+    </select>
   </div>
+
+  <div id="cards"></div>
+  <div id="error" class="error"></div>
 
   <script>
     async function loadCocktails() {
       try {
-        const response = await fetch('/data/cocktail_data_backup.json');
-        const cocktails = await response.json();
+        const res = await fetch("/data/cocktail_data_backup.json");
+        const data = await res.json();
 
-        const container = document.getElementById('cocktail-list');
-        container.innerHTML = '';
+        if (!Array.isArray(data)) throw new Error("Data is not an array");
 
-        cocktails.forEach(cocktail => {
-          const card = document.createElement('div');
-          card.className = 'card';
+        window.cocktails = data.map(c => ({
+          ...c,
+          tag: c.tag || "Uncategorised"
+        }));
 
-          card.innerHTML = `
-            <h2>${cocktail.title || 'Untitled'}</h2>
-            <p><span class="field-label">Ingredients:</span> ${Array.isArray(cocktail.ingredients) ? cocktail.ingredients.join(', ') : 'N/A'}</p>
-            <p><span class="field-label">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
-            <p><span class="field-label">Method:</span> ${cocktail.method || 'N/A'}</p>
-            <p><span class="field-label">Pro Tip:</span> ${cocktail['pro_tip'] || 'N/A'}</p>
-            <p><span class="field-label">Did You Know:</span> ${cocktail['did_you_know'] || 'N/A'}</p>
-            <p><span class="field-label">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
-          `;
-
-          container.appendChild(card);
-        });
+        renderCards();
       } catch (err) {
-        document.getElementById('cocktail-list').innerHTML = '<p class="error">Failed to load cocktail data. Please check the Drive link or format.</p>';
-        console.error('Load error:', err);
+        document.getElementById("error").innerText = "Failed to load cocktail data. Please check the Drive link or format.";
+        console.error(err);
       }
     }
+
+    function renderCards() {
+      const searchTerm = document.getElementById("search").value.toLowerCase();
+      const selectedTag = document.getElementById("filter").value;
+      const cardsContainer = document.getElementById("cards");
+      cardsContainer.innerHTML = "";
+
+      const filtered = window.cocktails.filter(c => {
+        const matchesSearch = c.title.toLowerCase().includes(searchTerm);
+        const matchesTag = selectedTag === "All" || c.tag === selectedTag;
+        return matchesSearch && matchesTag;
+      });
+
+      filtered.forEach(cocktail => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${cocktail.title}</h2>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients.join(", ")}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware}</p>
+          <p><strong>Method:</strong> ${cocktail.method}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail["pro_tip"]}</p>
+          <p><strong>Did You Know:</strong> ${cocktail["did_you_know"]}</p>
+          <p><strong>Category:</strong> ${cocktail.tag}</p>
+        `;
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", renderCards);
+    document.getElementById("filter").addEventListener("change", renderCards);
 
     loadCocktails();
   </script>
