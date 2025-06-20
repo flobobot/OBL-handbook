@@ -43,10 +43,14 @@
 
   <script>
     async function fetchCocktails() {
-      const res = await fetch('/.netlify/functions/load-cocktail-data');
-      const data = await res.json();
-      return JSON.parse(data.body);
-    }
+  const res = await fetch('/.netlify/functions/load-cocktail-data');
+  try {
+    return await res.json(); // Let browser parse it once
+  } catch (err) {
+    console.error('Failed to parse cocktail data from response:', err);
+    return [];
+  }
+}
 
     function renderCocktailCard(cocktail) {
       return `
