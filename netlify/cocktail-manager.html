@@ -5,16 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Old Blue Last Cocktail Manager</title>
   <style>
+    :root {
+      --main-bg: #f4f4f4;
+      --card-bg: #fff;
+      --primary: #111;
+      --accent: #fcb900;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f8f8;
       margin: 0;
       padding: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: var(--main-bg);
+      color: var(--primary);
     }
 
     header {
-      background: #111;
-      color: #fff;
+      background: var(--primary);
+      color: white;
       padding: 1rem 2rem;
       display: flex;
       gap: 2rem;
@@ -28,8 +36,9 @@
     }
 
     h1 {
-      margin: 2rem;
+      text-align: center;
       font-size: 2rem;
+      margin-top: 1rem;
     }
 
     .controls {
@@ -37,38 +46,62 @@
       justify-content: center;
       gap: 1rem;
       margin: 1rem 2rem;
+      flex-wrap: wrap;
     }
 
-    input, select {
+    .controls input, .controls select {
       padding: 0.5rem;
       font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     #cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
       padding: 2rem;
     }
 
     .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: var(--card-bg);
+      border-radius: 16px;
       padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
     }
 
     .card h2 {
       margin-top: 0;
       font-size: 1.5rem;
-      color: #222;
+      color: var(--primary);
     }
 
     .card p {
-      margin: 0.25rem 0;
+      margin: 0.4rem 0;
+      line-height: 1.4;
+    }
+
+    .card strong {
+      color: var(--accent);
+    }
+
+    .card-buttons {
+      margin-top: 1rem;
+    }
+
+    .card-buttons button {
+      background-color: var(--accent);
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .error {
@@ -131,7 +164,200 @@
 
       const filtered = window.cocktails.filter(c => {
         const matchesSearch = c.title?.toLowerCase().includes(searchTerm);
-        const matchesTag = selectedTag === "All" || (c.tag === selectedTag);
+        const matchesTag = selectedTag === "All" || c.tag === selectedTag;
+        return matchesSearch && matchesTag;
+      });
+
+      filtered.forEach(cocktail => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h2>${cocktail.title || "Unnamed Cocktail"}</h2>
+          <p><strong>Ingredients:</strong> ${cocktail.ingredients?.join(", ") || "N/A"}</p>
+          <p><strong>Glassware:</strong> ${cocktail.glassware || "N/A"}</p>
+          <p><strong>Method:</strong> ${cocktail.method || "N/A"}</p>
+          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "N/A"}</p>
+          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "N/A"}</p>
+          <p><strong>Category:</strong> ${cocktail.tag || "Uncategorised"}</p>
+          <div class="card-buttons">
+            <button onclick="editCocktail('${cocktail.title}')">Edit</button>
+            <button onclick="deleteCocktail('${cocktail.title}')">Delete</button>
+          </div>
+        `;
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    function editCocktail(title) {
+      window.location.href = `/cocktail-editor.html?name=${encodeURIComponent(title)}`;
+    }
+
+    function deleteCocktail(title) {
+      if (confirm(`Are you sure you want to delete "${title}"?`)) {
+        window.cocktails = window.cocktails.filter(c => c.title !== title);
+        renderCards();
+      }
+    }
+
+    document.getElementById("search").addEventListener("input", renderCards);
+    document.getElementById("filter").addEventListener("change", renderCards);
+
+    loadCocktails();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Old Blue Last Cocktail Manager</title>
+  <style>
+    :root {
+      --main-bg: #f4f4f4;
+      --card-bg: #fff;
+      --primary: #111;
+      --accent: #fcb900;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: var(--main-bg);
+      color: var(--primary);
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-top: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem 2rem;
+      flex-wrap: wrap;
+    }
+
+    .controls input, .controls select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    #cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .card p {
+      margin: 0.4rem 0;
+      line-height: 1.4;
+    }
+
+    .card strong {
+      color: var(--accent);
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/cocktail-manager.html">Cocktails</a>
+    <a href="/training.html">Training</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/login.html">Login</a>
+  </header>
+
+  <h1>Old Blue Last Cocktail Manager</h1>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search cocktails...">
+    <select id="filter">
+      <option value="All">All Tags</option>
+      <option value="Classic">Classic</option>
+      <option value="House Riff">House Riff</option>
+      <option value="Non-Alcoholic">Non-Alcoholic</option>
+      <option value="Uncategorised">Uncategorised</option>
+    </select>
+  </div>
+
+  <div id="cards"></div>
+  <div id="error" class="error"></div>
+
+  <script>
+    async function loadCocktails() {
+      try {
+        const res = await fetch("/data/cocktail_data_backup.json");
+        const data = await res.json();
+
+        if (!Array.isArray(data)) throw new Error("Data is not an array");
+
+        window.cocktails = data.map(c => ({
+          ...c,
+          tag: c.tag || "Uncategorised"
+        }));
+
+        renderCards();
+      } catch (err) {
+        document.getElementById("error").innerText = "Failed to load cocktail data. Please check the Drive link or format.";
+        console.error(err);
+      }
+    }
+
+    function renderCards() {
+      const searchTerm = document.getElementById("search").value.toLowerCase();
+      const selectedTag = document.getElementById("filter").value;
+      const cardsContainer = document.getElementById("cards");
+      cardsContainer.innerHTML = "";
+
+      const filtered = window.cocktails.filter(c => {
+        const matchesSearch = c.title?.toLowerCase().includes(searchTerm);
+        const matchesTag = selectedTag === "All" || c.tag === selectedTag;
         return matchesSearch && matchesTag;
       });
 
