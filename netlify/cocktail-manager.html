@@ -2,35 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
   <style>
     body {
-      font-family: system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       margin: 0;
-      background: #f4f4f4;
+      padding: 0;
+      background-color: #f4f4f4;
       color: #333;
     }
     header {
-      background: #1c1c1c;
+      background-color: #1c1c1c;
       color: white;
       padding: 1rem;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
-    nav a {
+    header nav a {
       color: white;
       margin-left: 1rem;
       text-decoration: none;
     }
     .container {
       max-width: 1200px;
-      margin: auto;
-      padding: 1rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
     h1 {
       text-align: center;
-      margin: 1rem 0;
+      margin-bottom: 1rem;
     }
     .filters {
       display: flex;
@@ -50,28 +53,31 @@
     }
     .card {
       background: white;
-      padding: 1rem;
+      padding: 1.2rem;
       border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: relative;
+    }
+    .card h2 {
+      margin-top: 0;
     }
     .highlight {
       font-weight: bold;
       color: #f9a825;
     }
+    .error {
+      color: red;
+      text-align: center;
+    }
     .edit-btn {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: #ffcc80;
+      background-color: #ffb300;
       border: none;
-      border-radius: 6px;
-      padding: 4px 8px;
+      padding: 5px 10px;
+      border-radius: 5px;
       cursor: pointer;
-    }
-    .error {
-      color: red;
-      text-align: center;
     }
   </style>
 </head>
@@ -88,9 +94,12 @@
     <h1>Old Blue Last Cocktail Manager</h1>
     <div class="filters">
       <input type="text" id="searchInput" placeholder="Search cocktails..." />
-      <select id="tagFilter"><option value="">All Tags</option></select>
+      <select id="tagFilter">
+        <option value="">All Tags</option>
+      </select>
       <button id="downloadPdfBtn">Download TXT</button>
     </div>
+    <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
   </main>
   <script>
@@ -102,7 +111,9 @@
         const data = await response.json();
         return data;
       } catch (error) {
-        console.error('Failed to load data:', error);
+        document.getElementById('error').textContent =
+          'Failed to load cocktail data. Please check the Drive link or format.';
+        console.error(error);
         return [];
       }
     }
@@ -111,22 +122,38 @@
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
 
-      cocktails.forEach((cocktail, index) => {
+      cocktails.forEach(cocktail => {
         const card = document.createElement('div');
         card.className = 'card';
-        const ingredients = cocktail.ingredients?.join(', ') || '—';
+
+        const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
+        const proTip = cocktail['pro-tip'] || cocktail['proTip'] || cocktail['Pro Tip'] || '—';
+
         card.innerHTML = `
-          <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <h2>${cocktail.title}</h2>
+          <button class="edit-btn">Edit</button>
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
-          <p><span class="highlight">Glassware:</span> ${cocktail.glassware || '—'}</p>
-          <p><span class="highlight">Method:</span> ${cocktail.method || '—'}</p>
-          <p><span class="highlight">Pro Tip:</span> ${cocktail["pro-tip"] || '—'}</p>
+          <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
+          <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${proTip}</p>
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
+
         container.appendChild(card);
       });
+    }
+
+    function generatePdf(cocktails) {
+      const content = cocktails.map(c => {
+        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip']}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
+      }).join('\n');
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'cocktail_cards.txt';
+      link.click();
     }
 
     async function init() {
@@ -134,8 +161,8 @@
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
-      const tagFilter = document.getElementById('tagFilter');
       const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
+      const tagFilter = document.getElementById('tagFilter');
       tags.forEach(tag => {
         const option = document.createElement('option');
         option.value = tag;
@@ -157,14 +184,7 @@
         displayCocktails(filtered);
       });
 
-      document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-        const content = cocktails.map(c => `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip']}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag || 'Uncategorised'}\n\n`).join('\n');
-        const blob = new Blob([content], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'cocktail_cards.txt';
-        link.click();
-      });
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
     }
 
     init();
