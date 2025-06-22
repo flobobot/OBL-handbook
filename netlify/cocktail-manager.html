@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
@@ -130,16 +131,34 @@
       });
     }
 
-    function generatePdf(cocktails) {
-      const content = cocktails.map(c => {
-        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nTip: ${c['pro-tip']}\nFact: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
-      }).join('\n');
+    async function generatePdf(cocktails) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
 
-      const blob = new Blob([content], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'cocktail_cards.pdf';
-      link.click();
+      cocktails.forEach((c, index) => {
+        doc.text(`Cocktail: ${c.title}`, 10, y);
+        y += 6;
+        doc.text(`Ingredients: ${c.ingredients?.join(', ')}`, 10, y);
+        y += 6;
+        doc.text(`Glassware: ${c.glassware || ''}`, 10, y);
+        y += 6;
+        doc.text(`Method: ${c.method || ''}`, 10, y);
+        y += 6;
+        doc.text(`Tip: ${c['pro-tip'] || ''}`, 10, y);
+        y += 6;
+        doc.text(`Fact: ${c.did_you_know || ''}`, 10, y);
+        y += 6;
+        doc.text(`Category: ${c.tag || ''}`, 10, y);
+        y += 10;
+
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      doc.save('cocktail_cards.pdf');
     }
 
     async function init() {
