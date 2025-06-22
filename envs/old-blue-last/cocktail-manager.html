@@ -112,7 +112,7 @@
 
     async function loadCocktails() {
       try {
-        const response = await fetch("/OBL-handbook/netlify/data/cocktail_data_backup.json");
+        const response = await fetch("/netlify/data/cocktail_data_backup.json");
         const data = await response.json();
 
         if (!Array.isArray(data)) throw new Error("Cocktail data is not an array");
