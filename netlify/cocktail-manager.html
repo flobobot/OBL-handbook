@@ -69,44 +69,17 @@
       color: red;
       text-align: center;
     }
-    #adminLoginBtn {
-      margin-left: auto;
-      background: #f9a825;
-      border: none;
-      font-weight: bold;
-    }
     .edit-btn {
       position: absolute;
       top: 10px;
       right: 10px;
-      padding: 4px 8px;
-      background: #f9a825;
-      border: none;
-      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
       cursor: pointer;
-      display: none;
-    }
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-content {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      max-width: 500px;
-      width: 90%;
-    }
-    .modal-content input, .modal-content textarea {
-      width: 100%;
-      margin-bottom: 1rem;
+      border: none;
+      background-color: #f9a825;
+      color: white;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -117,7 +90,6 @@
       <a href="#">Training</a>
       <a href="#">Admin</a>
       <a href="#">Login</a>
-      <button id="adminLoginBtn">Admin Login</button>
     </nav>
   </header>
   <main class="container">
@@ -132,20 +104,8 @@
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
   </main>
-
-  <div class="modal" id="adminModal">
-    <div class="modal-content">
-      <h3>Enter Admin Password</h3>
-      <input type="password" id="adminPassword" placeholder="Password" />
-      <button onclick="validateAdmin()">Login</button>
-    </div>
-  </div>
-
   <script>
     const DATA_PATH = '/data/cocktail_data_backup.json';
-    const ADMIN_KEY = 'cocktail-admin';
-    const ADMIN_PASS = 'lastorders';
-
     let isAdmin = false;
 
     async function fetchCocktails() {
@@ -170,20 +130,23 @@
         card.className = 'card';
 
         const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
+        const proTip = cocktail['pro-tip'] || cocktail.pro_tip || '—';
+
         card.innerHTML = `
           <h2>${cocktail.title}</h2>
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
-          <p><span class="highlight">Pro Tip:</span> ${cocktail["pro-tip"] || '—'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${proTip}</p>
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
 
         if (isAdmin) {
           const editBtn = document.createElement('button');
-          editBtn.textContent = 'Edit';
           editBtn.className = 'edit-btn';
+          editBtn.textContent = 'Edit';
+          editBtn.onclick = () => alert(`Edit modal for: ${cocktail.title}`);
           card.appendChild(editBtn);
         }
 
@@ -193,7 +156,7 @@
 
     function generatePdf(cocktails) {
       const content = cocktails.map(c => {
-        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip']}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
+        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip'] || c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
       }).join('\n');
 
       const blob = new Blob([content], { type: 'text/plain' });
@@ -203,32 +166,13 @@
       link.click();
     }
 
-    function validateAdmin() {
-      const input = document.getElementById('adminPassword').value;
-      if (input === ADMIN_PASS) {
-        localStorage.setItem(ADMIN_KEY, 'true');
-        isAdmin = true;
-        document.getElementById('adminModal').style.display = 'none';
-        init();
-      } else {
-        alert('Incorrect password.');
-      }
-    }
-
-    document.getElementById('adminLoginBtn').addEventListener('click', () => {
-      document.getElementById('adminModal').style.display = 'flex';
-    });
-
     async function init() {
-      isAdmin = localStorage.getItem(ADMIN_KEY) === 'true';
       const cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
-      // Populate tag filter
       const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
-      tagFilter.innerHTML = '<option value="">All Tags</option>';
       tags.forEach(tag => {
         const option = document.createElement('option');
         option.value = tag;
@@ -251,6 +195,14 @@
       });
 
       document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
+
+      // Admin login handler (simulated for now)
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'a') {
+          isAdmin = !isAdmin;
+          displayCocktails(cocktails);
+        }
+      });
     }
 
     init();
