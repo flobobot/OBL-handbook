@@ -41,7 +41,7 @@
       gap: 1rem;
       margin-bottom: 2rem;
     }
-    input, select {
+    input, select, button {
       padding: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -69,6 +69,8 @@
       text-align: center;
     }
   </style>
+  <!-- Add jsPDF library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header>
@@ -86,6 +88,7 @@
       <select id="tagFilter">
         <option value="">All Tags</option>
       </select>
+      <button id="downloadPdfBtn">Download PDF</button>
     </div>
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
@@ -120,7 +123,7 @@
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
-          <p><span class="highlight">Pro Tip:</span> ${cocktail['pro-tip'] || '—'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
@@ -129,11 +132,32 @@
       });
     }
 
+    async function generatePdf(cocktails) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      cocktails.forEach((c, index) => {
+        doc.setFontSize(12);
+        doc.text(`Cocktail: ${c.title || ''}`, 10, 20);
+        doc.text(`Ingredients: ${c.ingredients?.join(', ') || ''}`, 10, 30);
+        doc.text(`Glassware: ${c.glassware || ''}`, 10, 40);
+        doc.text(`Method: ${c.method || ''}`, 10, 50);
+        doc.text(`Pro Tip: ${c.pro_tip || '—'}`, 10, 60);
+        doc.text(`Did You Know: ${c.did_you_know || '—'}`, 10, 70);
+        doc.text(`Category: ${c.tag || 'Uncategorised'}`, 10, 80);
+
+        if (index !== cocktails.length - 1) doc.addPage();
+      });
+
+      doc.save('cocktail_cards.pdf');
+    }
+
     async function init() {
       const cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
+      // Populate tag filter
       const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
       tags.forEach(tag => {
@@ -156,6 +180,8 @@
           : cocktails;
         displayCocktails(filtered);
       });
+
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
     }
 
     init();
