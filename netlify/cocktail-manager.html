@@ -1,171 +1,210 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Old Blue Last Cocktail Manager</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Old Blue Last Cocktail Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f8f8;
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f5f5;
       margin: 0;
       padding: 0;
     }
-
     header {
-      background: #111;
-      color: #fff;
+      background-color: #1a1a1a;
+      color: white;
       padding: 1rem 2rem;
       display: flex;
-      gap: 2rem;
+      justify-content: space-between;
       align-items: center;
     }
-
-    header a {
+    nav a {
       color: white;
+      margin-left: 1.5rem;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 500;
     }
-
     h1 {
-      margin: 2rem;
+      padding: 2rem;
       font-size: 2rem;
+      text-align: center;
+      margin-bottom: 0;
     }
-
     .controls {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin: 1rem 2rem;
+      margin: 1rem auto;
+      flex-wrap: wrap;
     }
-
-    input, select {
-      padding: 0.5rem;
+    input, select, button {
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
       font-size: 1rem;
     }
-
-    #cards {
+    #cocktailCards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
       padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-
     .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background-color: white;
       padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
     .card h2 {
       margin-top: 0;
-      font-size: 1.5rem;
-      color: #222;
+      font-size: 1.3rem;
     }
-
-    .card p {
-      margin: 0.25rem 0;
+    .highlight {
+      font-weight: bold;
     }
-
-    .error {
+    .highlight-orange { color: orange; }
+    .highlight-blue { color: steelblue; }
+    .highlight-green { color: seagreen; }
+    .highlight-purple { color: rebeccapurple; }
+    .highlight-grey { color: grey; }
+    #error {
+      text-align: center;
       color: red;
       font-weight: bold;
-      text-align: center;
       margin-top: 2rem;
     }
   </style>
 </head>
 <body>
-<header>
-<a href="/cocktail-manager.html">Cocktails</a>
-<a href="/training.html">Training</a>
-<a href="/admin.html">Admin</a>
-<a href="/login.html">Login</a>
-</header>
-<h1>Old Blue Last Cocktail Manager</h1>
-<div class="controls">
-<input id="search" placeholder="Search cocktails..." type="text"/>
-<select id="filter">
-<option value="All">All Tags</option>
-<option value="Classic">Classic</option>
-<option value="House Riff">House Riff</option>
-<option value="Non-Alcoholic">Non-Alcoholic</option>
-<option value="Uncategorised">Uncategorised</option>
-</select>
-</div>
-<div id="cards"></div>
-<div class="error" id="error"></div>
-<script>
+  <header>
+    <div><strong>Cocktails</strong></div>
+    <nav>
+      <a href="#">Training</a>
+      <a href="#">Admin</a>
+      <a href="#">Login</a>
+    </nav>
+  </header>
+
+  <h1>Old Blue Last Cocktail Manager</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search cocktails..." onkeyup="filterCards()" />
+    <select id="tagFilter" onchange="filterCards()">
+      <option value="all">All Tags</option>
+    </select>
+    <button onclick="downloadPDF()">Download PDF</button>
+  </div>
+
+  <div id="cocktailCards">Loading...</div>
+  <div id="error"></div>
+
+  <script>
+    const cardContainer = document.getElementById("cocktailCards");
+    const searchInput = document.getElementById("searchInput");
+    const tagFilter = document.getElementById("tagFilter");
+
+    let allCocktails = [];
+
     async function loadCocktails() {
       try {
-        const res = await fetch("/data/cocktail_data_backup.json");
-        const data = await res.json();
+        const response = await fetch("/netlify/data/cocktail_data_backup.json");
+        const data = await response.json();
 
-        if (!Array.isArray(data)) throw new Error("Data is not an array");
-
-        window.cocktails = data.map(c => ({
-          ...c,
-          tag: c.tag || "Uncategorised"
-        }));
-
-        renderCards();
+        if (!Array.isArray(data)) throw new Error("Cocktail data is not an array");
+        allCocktails = data;
+        populateTagFilter();
+        displayCocktails(allCocktails);
       } catch (err) {
-        document.getElementById("error").innerText = "Failed to load cocktail data. Please check the Drive link or format.";
-        console.error(err);
+        console.error("Load error:", err);
+        document.getElementById("error").textContent = "Failed to load cocktail data. Please check the Drive link or format.";
+        cardContainer.innerHTML = "";
       }
     }
 
-    function renderCards() {
-      const searchTerm = document.getElementById("search").value.toLowerCase();
-      const selectedTag = document.getElementById("filter").value;
-      const cardsContainer = document.getElementById("cards");
-      cardsContainer.innerHTML = "";
-
-      const filtered = window.cocktails.filter(c => {
-        const matchesSearch = c.title?.toLowerCase().includes(searchTerm);
-        const matchesTag = selectedTag === "All" || (c.tag === selectedTag);
-        return matchesSearch && matchesTag;
+    function populateTagFilter() {
+      const tags = new Set();
+      allCocktails.forEach(cocktail => {
+        if (cocktail.tag) tags.add(cocktail.tag);
       });
-
-      filtered.forEach(cocktail => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <h2>${cocktail.title || "Unnamed Cocktail"}</h2>
-          <p><strong>Ingredients:</strong> ${cocktail.ingredients?.join(", ") || "N/A"}</p>
-          <p><strong>Glassware:</strong> ${cocktail.glassware || "N/A"}</p>
-          <p><strong>Method:</strong> ${cocktail.method || "N/A"}</p>
-          <p><strong>Pro Tip:</strong> ${cocktail.pro_tip || "N/A"}</p>
-          <p><strong>Did You Know:</strong> ${cocktail.did_you_know || "N/A"}</p>
-          <p><strong>Category:</strong> ${cocktail.tag || "Uncategorised"}</p>
-        `;
-        cardsContainer.appendChild(card);
+      [...tags].sort().forEach(tag => {
+        const option = document.createElement("option");
+        option.value = tag;
+        option.textContent = tag;
+        tagFilter.appendChild(option);
       });
     }
 
-    document.getElementById("search").addEventListener("input", renderCards);
-    document.getElementById("filter").addEventListener("change", renderCards);
+    function filterCards() {
+      const search = searchInput.value.toLowerCase();
+      const tag = tagFilter.value;
+      const filtered = allCocktails.filter(cocktail => {
+        const matchesSearch = cocktail.title.toLowerCase().includes(search);
+        const matchesTag = tag === "all" || cocktail.tag === tag;
+        return matchesSearch && matchesTag;
+      });
+      displayCocktails(filtered);
+    }
+
+    function displayCocktails(cocktails) {
+      if (cocktails.length === 0) {
+        cardContainer.innerHTML = "<p>No cocktails found.</p>";
+        return;
+      }
+
+      cardContainer.innerHTML = cocktails.map(c => `
+        <div class="card">
+          <h2>${c.title}</h2>
+          <p><span class="highlight highlight-orange">Ingredients:</span> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}</p>
+          <p><span class="highlight highlight-purple">Glassware:</span> ${c.glassware || 'N/A'}</p>
+          <p><span class="highlight highlight-orange">Method:</span> ${c.method}</p>
+          <p><span class="highlight highlight-green">Pro Tip:</span> ${c["pro-tip"] || ''}</p>
+          <p><span class="highlight highlight-blue">Did You Know:</span> ${c["did_you_know"] || ''}</p>
+          <p><span class="highlight highlight-grey">Category:</span> ${c.tag || "Uncategorised"}</p>
+        </div>
+      `).join("");
+    }
+
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+
+      allCocktails.forEach((c, i) => {
+        doc.setFontSize(12);
+        doc.text(`${i + 1}. ${c.title}`, 10, y);
+        y += 8;
+        doc.setFontSize(10);
+        doc.text(`Ingredients: ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}`, 10, y);
+        y += 6;
+        doc.text(`Glassware: ${c.glassware || 'N/A'}`, 10, y);
+        y += 6;
+        doc.text(`Method: ${c.method}`, 10, y);
+        y += 6;
+        if (c["pro-tip"]) {
+          doc.text(`Pro Tip: ${c["pro-tip"]}`, 10, y);
+          y += 6;
+        }
+        if (c["did_you_know"]) {
+          doc.text(`Did You Know: ${c["did_you_know"]}`, 10, y);
+          y += 6;
+        }
+        doc.text(`Category: ${c.tag || "Uncategorised"}`, 10, y);
+        y += 10;
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      doc.save("cocktail_cards.pdf");
+    }
 
     loadCocktails();
   </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-  function exportToPDF() {
-    const element = document.getElementById("card-container");
-    const opt = {
-      margin:       0.5,
-      filename:     'cocktail-cards.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().from(element).set(opt).save();
-  }
-</script>
 </body>
 </html>
