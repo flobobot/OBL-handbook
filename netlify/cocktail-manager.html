@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
@@ -42,7 +41,7 @@
       gap: 1rem;
       margin-bottom: 2rem;
     }
-    input, select, button {
+    input, select {
       padding: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -87,7 +86,6 @@
       <select id="tagFilter">
         <option value="">All Tags</option>
       </select>
-      <button id="downloadPdfBtn">Download PDF</button>
     </div>
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
@@ -131,35 +129,6 @@
       });
     }
 
-    async function generatePdf(cocktails) {
-      const {{ jsPDF }} = window.jspdf;
-      const doc = new jsPDF();
-
-      let y = 10;
-      cocktails.forEach(c => {
-        const lines = [
-          `Cocktail: ${c.title}`,
-          `Ingredients: ${c.ingredients?.join(', ')}`,
-          `Glassware: ${c.glassware}`,
-          `Method: ${c.method}`,
-          `Pro Tip: ${c['pro-tip']}`,
-          `Did You Know: ${c.did_you_know}`,
-          `Category: ${c.tag}`,
-          ''
-        ];
-        lines.forEach(line => {
-          doc.text(line, 10, y);
-          y += 8;
-          if (y > 280) {
-            doc.addPage();
-            y = 10;
-          }
-        });
-      });
-
-      doc.save('cocktail_cards.pdf');
-    }
-
     async function init() {
       const cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
@@ -187,8 +156,6 @@
           : cocktails;
         displayCocktails(filtered);
       });
-
-      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
     }
 
     init();
