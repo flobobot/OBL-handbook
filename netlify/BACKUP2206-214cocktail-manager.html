@@ -1,0 +1,251 @@
+<!-- LAST WORKING -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Old Blue Last Cocktail Manager</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #1c1c1c;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    input, select, button {
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #f9a825;
+    }
+    .edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ffcc80;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+    }
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Cocktails</strong></div>
+    <nav>
+      <a href="#">Training</a>
+      <a href="#">Admin</a>
+      <a href="#">Login</a>
+    </nav>
+  </header>
+  <main class="container">
+    <h1>Old Blue Last Cocktail Manager</h1>
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search cocktails..." />
+      <select id="tagFilter"><option value="">All Tags</option></select>
+      <button id="downloadPdfBtn">Download TXT</button>
+    </div>
+    <div id="cocktailCards" class="cards"></div>
+
+    <!-- Modal -->
+    <div id="editModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3>Edit Cocktail</h3>
+        <input id="editTitle" placeholder="Title" />
+        <textarea id="editIngredients" placeholder="Ingredients"></textarea>
+        <input id="editGlassware" placeholder="Glassware" />
+        <input id="editMethod" placeholder="Method" />
+        <input id="editProTip" placeholder="Pro Tip" />
+        <input id="editDidYouKnow" placeholder="Did You Know" />
+        <input id="editTag" placeholder="Category Tag" />
+        <button id="saveBtn">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const DATA_PATH = '/data/cocktail_data_backup.json';
+    let cocktails = [];
+    let editingIndex = null;
+
+    async function fetchCocktails() {
+      try {
+        const response = await fetch(DATA_PATH);
+        cocktails = await response.json();
+        return cocktails;
+      } catch (err) {
+        alert("Failed to load data");
+        return [];
+      }
+    }
+
+    function displayCocktails(list) {
+      const container = document.getElementById('cocktailCards');
+      container.innerHTML = '';
+
+      list.forEach((c, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
+          <h2>${c.title}</h2>
+          <p><span class="highlight">Ingredients:</span> ${c.ingredients?.join(', ') || '—'}</p>
+          <p><span class="highlight">Glassware:</span> ${c.glassware || '—'}</p>
+          <p><span class="highlight">Method:</span> ${c.method || '—'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${c["pro-tip"] || '—'}</p>
+          <p><span class="highlight">Did You Know:</span> ${c.did_you_know || '—'}</p>
+          <p><span class="highlight">Category:</span> ${c.tag || 'Uncategorised'}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openEdit(index) {
+      editingIndex = index;
+      const c = cocktails[index];
+      document.getElementById('editTitle').value = c.title;
+      document.getElementById('editIngredients').value = c.ingredients?.join(', ');
+      document.getElementById('editGlassware').value = c.glassware || '';
+      document.getElementById('editMethod').value = c.method || '';
+      document.getElementById('editProTip').value = c["pro-tip"] || '';
+      document.getElementById('editDidYouKnow').value = c.did_you_know || '';
+      document.getElementById('editTag').value = c.tag || '';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      if (editingIndex === null) return;
+      const edited = {
+        ...cocktails[editingIndex],
+        title: document.getElementById('editTitle').value,
+        ingredients: document.getElementById('editIngredients').value.split(',').map(i => i.trim()),
+        glassware: document.getElementById('editGlassware').value,
+        method: document.getElementById('editMethod').value,
+        "pro-tip": document.getElementById('editProTip').value,
+        did_you_know: document.getElementById('editDidYouKnow').value,
+        tag: document.getElementById('editTag').value,
+      };
+      cocktails[editingIndex] = edited;
+      displayCocktails(cocktails);
+      closeModal();
+    });
+
+    function generatePdf(cocktails) {
+      const content = cocktails.map(c => `
+Cocktail: ${c.title}
+Ingredients: ${c.ingredients?.join(', ')}
+Glassware: ${c.glassware}
+Method: ${c.method}
+Pro Tip: ${c["pro-tip"]}
+Did You Know: ${c.did_you_know}
+Category: ${c.tag || 'Uncategorised'}
+`).join('\n');
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'cocktail_cards.txt';
+      link.click();
+    }
+
+    async function init() {
+      await fetchCocktails();
+      displayCocktails(cocktails);
+
+      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
+      tags.forEach(tag => {
+        const o = document.createElement('option');
+        o.value = tag;
+        o.textContent = tag;
+        document.getElementById('tagFilter').appendChild(o);
+      });
+
+      document.getElementById('searchInput').addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        const filtered = cocktails.filter(c => c.title.toLowerCase().includes(q));
+        displayCocktails(filtered);
+      });
+
+      document.getElementById('tagFilter').addEventListener('change', e => {
+        const t = e.target.value;
+        const filtered = t ? cocktails.filter(c => c.tag === t) : cocktails;
+        displayCocktails(filtered);
+      });
+
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
+    }
+
+    init();
+  </script>
+</body>
+</html>
