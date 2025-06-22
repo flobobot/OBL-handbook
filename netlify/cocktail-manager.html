@@ -69,6 +69,8 @@
       text-align: center;
     }
   </style>
+  <!-- Add jsPDF library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header>
@@ -121,7 +123,7 @@
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
-          <p><span class="highlight">Pro Tip:</span> ${cocktail["pro-tip"] || '—'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
@@ -130,16 +132,24 @@
       });
     }
 
-    function generatePdf(cocktails) {
-      const content = cocktails.map(c => {
-        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip']}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
-      }).join('\n');
+    async function generatePdf(cocktails) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-      const blob = new Blob([content], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'cocktail_cards.txt';
-      link.click();
+      cocktails.forEach((c, index) => {
+        doc.setFontSize(12);
+        doc.text(`Cocktail: ${c.title || ''}`, 10, 20);
+        doc.text(`Ingredients: ${c.ingredients?.join(', ') || ''}`, 10, 30);
+        doc.text(`Glassware: ${c.glassware || ''}`, 10, 40);
+        doc.text(`Method: ${c.method || ''}`, 10, 50);
+        doc.text(`Pro Tip: ${c.pro_tip || '—'}`, 10, 60);
+        doc.text(`Did You Know: ${c.did_you_know || '—'}`, 10, 70);
+        doc.text(`Category: ${c.tag || 'Uncategorised'}`, 10, 80);
+
+        if (index !== cocktails.length - 1) doc.addPage();
+      });
+
+      doc.save('cocktail_cards.pdf');
     }
 
     async function init() {
