@@ -71,12 +71,13 @@
     }
     .edit-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #ffb300;
+      top: 12px;
+      right: 12px;
+      background-color: #f9a825;
       border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-weight: bold;
       cursor: pointer;
     }
   </style>
@@ -122,16 +123,15 @@
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
 
-      cocktails.forEach(cocktail => {
+      cocktails.forEach((cocktail, index) => {
         const card = document.createElement('div');
         card.className = 'card';
 
         const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
-        const proTip = cocktail['pro-tip'] || cocktail['proTip'] || cocktail['Pro Tip'] || '—';
+        const proTip = cocktail.pro_tip || '—';
 
         card.innerHTML = `
           <h2>${cocktail.title}</h2>
-          <button class="edit-btn">Edit</button>
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
@@ -144,25 +144,13 @@
       });
     }
 
-    function generatePdf(cocktails) {
-      const content = cocktails.map(c => {
-        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c['pro-tip']}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
-      }).join('\n');
-
-      const blob = new Blob([content], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'cocktail_cards.txt';
-      link.click();
-    }
-
     async function init() {
       const cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
-      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
+      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       tags.forEach(tag => {
         const option = document.createElement('option');
         option.value = tag;
@@ -184,7 +172,17 @@
         displayCocktails(filtered);
       });
 
-      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+        const content = cocktails.map(c => {
+          return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
+        }).join('\n');
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'cocktail_cards.txt';
+        link.click();
+      });
     }
 
     init();
