@@ -2,81 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       margin: 0;
       padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
     }
     header {
-      background-color: #1a1a1a;
+      background-color: #1c1c1c;
       color: white;
-      padding: 1rem 2rem;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    nav a {
+    header nav a {
       color: white;
-      margin-left: 1.5rem;
+      margin-left: 1rem;
       text-decoration: none;
-      font-weight: 500;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
     h1 {
-      padding: 2rem;
-      font-size: 2rem;
       text-align: center;
-      margin-bottom: 0;
+      margin-bottom: 1rem;
     }
-    .controls {
+    .filters {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin: 1rem auto;
-      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
     input, select, button {
-      padding: 0.6rem;
-      border-radius: 8px;
+      padding: 0.5rem;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 1rem;
     }
-    #cocktailCards {
+    .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
     }
     .card {
-      background-color: white;
-      padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: white;
+      padding: 1.2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
     .card h2 {
       margin-top: 0;
-      font-size: 1.3rem;
     }
     .highlight {
       font-weight: bold;
+      color: #f9a825;
     }
-    .highlight-orange { color: orange; }
-    .highlight-blue { color: steelblue; }
-    .highlight-green { color: seagreen; }
-    .highlight-purple { color: rebeccapurple; }
-    .highlight-grey { color: grey; }
-    #error {
-      text-align: center;
+    .error {
       color: red;
-      font-weight: bold;
-      margin-top: 2rem;
+      text-align: center;
     }
   </style>
 </head>
@@ -89,122 +79,102 @@
       <a href="#">Login</a>
     </nav>
   </header>
-
-  <h1>Old Blue Last Cocktail Manager</h1>
-
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search cocktails..." onkeyup="filterCards()" />
-    <select id="tagFilter" onchange="filterCards()">
-      <option value="all">All Tags</option>
-    </select>
-    <button onclick="downloadPDF()">Download PDF</button>
-  </div>
-
-  <div id="cocktailCards">Loading...</div>
-  <div id="error"></div>
-
+  <main class="container">
+    <h1>Old Blue Last Cocktail Manager</h1>
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search cocktails..." />
+      <select id="tagFilter">
+        <option value="">All Tags</option>
+      </select>
+      <button id="downloadPdfBtn">Download PDF</button>
+    </div>
+    <div id="error" class="error"></div>
+    <div id="cocktailCards" class="cards"></div>
+  </main>
   <script>
-    const cardContainer = document.getElementById("cocktailCards");
-    const searchInput = document.getElementById("searchInput");
-    const tagFilter = document.getElementById("tagFilter");
+    const DATA_PATH = '/netlify/data/cocktail_data_backup.json';
 
-    let allCocktails = [];
-
-    async function loadCocktails() {
+    async function fetchCocktails() {
       try {
-        const response = await fetch("/netlify/data/cocktail_data_backup.json");
+        const response = await fetch(DATA_PATH);
         const data = await response.json();
-
-        if (!Array.isArray(data)) throw new Error("Cocktail data is not an array");
-        allCocktails = data;
-        populateTagFilter();
-        displayCocktails(allCocktails);
-      } catch (err) {
-        console.error("Load error:", err);
-        document.getElementById("error").textContent = "Failed to load cocktail data. Please check the Drive link or format.";
-        cardContainer.innerHTML = "";
+        return data;
+      } catch (error) {
+        document.getElementById('error').textContent =
+          'Failed to load cocktail data. Please check the Drive link or format.';
+        console.error(error);
+        return [];
       }
     }
 
-    function populateTagFilter() {
-      const tags = new Set();
-      allCocktails.forEach(cocktail => {
-        if (cocktail.tag) tags.add(cocktail.tag);
+    function displayCocktails(cocktails) {
+      const container = document.getElementById('cocktailCards');
+      container.innerHTML = '';
+
+      cocktails.forEach(cocktail => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
+        card.innerHTML = `
+          <h2>${cocktail.title}</h2>
+          <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
+          <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
+          <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${cocktail['pro-tip'] || '—'}</p>
+          <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
+          <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
+        `;
+
+        container.appendChild(card);
       });
-      [...tags].sort().forEach(tag => {
-        const option = document.createElement("option");
+    }
+
+    function generatePdf(cocktails) {
+      const content = cocktails.map(c => {
+        return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nTip: ${c['pro-tip']}\nFact: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
+      }).join('\n');
+
+      const blob = new Blob([content], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'cocktail_cards.pdf';
+      link.click();
+    }
+
+    async function init() {
+      const cocktails = await fetchCocktails();
+      if (cocktails.length === 0) return;
+      displayCocktails(cocktails);
+
+      // Populate tag filter
+      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
+      const tagFilter = document.getElementById('tagFilter');
+      tags.forEach(tag => {
+        const option = document.createElement('option');
         option.value = tag;
         option.textContent = tag;
         tagFilter.appendChild(option);
       });
-    }
 
-    function filterCards() {
-      const search = searchInput.value.toLowerCase();
-      const tag = tagFilter.value;
-      const filtered = allCocktails.filter(cocktail => {
-        const matchesSearch = cocktail.title.toLowerCase().includes(search);
-        const matchesTag = tag === "all" || cocktail.tag === tag;
-        return matchesSearch && matchesTag;
-      });
-      displayCocktails(filtered);
-    }
-
-    function displayCocktails(cocktails) {
-      if (cocktails.length === 0) {
-        cardContainer.innerHTML = "<p>No cocktails found.</p>";
-        return;
-      }
-
-      cardContainer.innerHTML = cocktails.map(c => `
-        <div class="card">
-          <h2>${c.title}</h2>
-          <p><span class="highlight highlight-orange">Ingredients:</span> ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}</p>
-          <p><span class="highlight highlight-purple">Glassware:</span> ${c.glassware || 'N/A'}</p>
-          <p><span class="highlight highlight-orange">Method:</span> ${c.method}</p>
-          <p><span class="highlight highlight-green">Pro Tip:</span> ${c["pro-tip"] || ''}</p>
-          <p><span class="highlight highlight-blue">Did You Know:</span> ${c["did_you_know"] || ''}</p>
-          <p><span class="highlight highlight-grey">Category:</span> ${c.tag || "Uncategorised"}</p>
-        </div>
-      `).join("");
-    }
-
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-
-      allCocktails.forEach((c, i) => {
-        doc.setFontSize(12);
-        doc.text(`${i + 1}. ${c.title}`, 10, y);
-        y += 8;
-        doc.setFontSize(10);
-        doc.text(`Ingredients: ${Array.isArray(c.ingredients) ? c.ingredients.join(", ") : c.ingredients}`, 10, y);
-        y += 6;
-        doc.text(`Glassware: ${c.glassware || 'N/A'}`, 10, y);
-        y += 6;
-        doc.text(`Method: ${c.method}`, 10, y);
-        y += 6;
-        if (c["pro-tip"]) {
-          doc.text(`Pro Tip: ${c["pro-tip"]}`, 10, y);
-          y += 6;
-        }
-        if (c["did_you_know"]) {
-          doc.text(`Did You Know: ${c["did_you_know"]}`, 10, y);
-          y += 6;
-        }
-        doc.text(`Category: ${c.tag || "Uncategorised"}`, 10, y);
-        y += 10;
-        if (y > 270) {
-          doc.addPage();
-          y = 10;
-        }
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = cocktails.filter(c => c.title.toLowerCase().includes(query));
+        displayCocktails(filtered);
       });
 
-      doc.save("cocktail_cards.pdf");
+      tagFilter.addEventListener('change', (e) => {
+        const selected = e.target.value;
+        const filtered = selected
+          ? cocktails.filter(c => c.tag === selected)
+          : cocktails;
+        displayCocktails(filtered);
+      });
+
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(cocktails));
     }
 
-    loadCocktails();
+    init();
   </script>
 </body>
 </html>
