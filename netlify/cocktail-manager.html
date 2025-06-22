@@ -132,30 +132,29 @@
     }
 
     async function generatePdf(cocktails) {
-      const { jsPDF } = window.jspdf;
+      const {{ jsPDF }} = window.jspdf;
       const doc = new jsPDF();
+
       let y = 10;
-
-      cocktails.forEach((c, index) => {
-        doc.text(`Cocktail: ${c.title}`, 10, y);
-        y += 6;
-        doc.text(`Ingredients: ${c.ingredients?.join(', ')}`, 10, y);
-        y += 6;
-        doc.text(`Glassware: ${c.glassware || ''}`, 10, y);
-        y += 6;
-        doc.text(`Method: ${c.method || ''}`, 10, y);
-        y += 6;
-        doc.text(`Tip: ${c['pro-tip'] || ''}`, 10, y);
-        y += 6;
-        doc.text(`Fact: ${c.did_you_know || ''}`, 10, y);
-        y += 6;
-        doc.text(`Category: ${c.tag || ''}`, 10, y);
-        y += 10;
-
-        if (y > 270) {
-          doc.addPage();
-          y = 10;
-        }
+      cocktails.forEach(c => {
+        const lines = [
+          `Cocktail: ${c.title}`,
+          `Ingredients: ${c.ingredients?.join(', ')}`,
+          `Glassware: ${c.glassware}`,
+          `Method: ${c.method}`,
+          `Pro Tip: ${c['pro-tip']}`,
+          `Did You Know: ${c.did_you_know}`,
+          `Category: ${c.tag}`,
+          ''
+        ];
+        lines.forEach(line => {
+          doc.text(line, 10, y);
+          y += 8;
+          if (y > 280) {
+            doc.addPage();
+            y = 10;
+          }
+        });
       });
 
       doc.save('cocktail_cards.pdf');
@@ -166,7 +165,6 @@
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
-      // Populate tag filter
       const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
       tags.forEach(tag => {
