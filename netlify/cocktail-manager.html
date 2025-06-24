@@ -61,17 +61,6 @@
     .card h2 {
       margin-top: 0;
     }
-    .edit-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #f9a825;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      color: white;
-      cursor: pointer;
-    }
     .highlight {
       font-weight: bold;
       color: #f9a825;
@@ -80,28 +69,39 @@
       color: red;
       text-align: center;
     }
-    #modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
+    .edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f9a825;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    #modalContent {
-      background: white;
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: white;
       padding: 2rem;
       border-radius: 12px;
-      width: 400px;
+      max-width: 500px;
+      width: 100%;
     }
-    #modalContent label {
-      display: block;
-      margin-top: 1rem;
-    }
-    #saveSuccess {
-      color: green;
-      text-align: center;
-      margin-top: 1rem;
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
     }
   </style>
 </head>
@@ -126,27 +126,25 @@
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
   </main>
-
-  <div id="modal">
-    <div id="modalContent">
-      <h2>Edit Cocktail</h2>
-      <label>Title: <input type="text" id="editTitle" /></label>
-      <label>Ingredients (comma-separated): <input type="text" id="editIngredients" /></label>
-      <label>Glassware: <input type="text" id="editGlassware" /></label>
-      <label>Method: <input type="text" id="editMethod" /></label>
-      <label>Pro Tip: <input type="text" id="editProTip" /></label>
-      <label>Did You Know: <input type="text" id="editDidYouKnow" /></label>
-      <label>Category: <input type="text" id="editTag" /></label>
+  <div id="editModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Edit Cocktail</h3>
+      <input id="editTitle" placeholder="Title">
+      <input id="editIngredients" placeholder="Ingredients (comma-separated)">
+      <input id="editGlassware" placeholder="Glassware">
+      <input id="editMethod" placeholder="Method">
+      <input id="editProTip" placeholder="Pro Tip">
+      <input id="editDidYouKnow" placeholder="Did You Know">
+      <input id="editTag" placeholder="Category">
       <button id="saveEdit">Save</button>
-      <button onclick="document.getElementById('modal').style.display='none'">Cancel</button>
-      <div id="saveSuccess"></div>
+      <button onclick="hideModal()">Cancel</button>
     </div>
   </div>
-
   <script>
     const DATA_PATH = '/data/cocktail_data_backup.json';
-    let currentCocktails = [];
-    let editingIndex = null;
+    let cocktails = [];
+    let currentEditIndex = null;
+    let isAdmin = false;
 
     async function fetchCocktails() {
       try {
@@ -161,16 +159,17 @@
       }
     }
 
-    function displayCocktails(cocktails) {
+    function displayCocktails(list) {
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
-      cocktails.forEach((cocktail, index) => {
+
+      list.forEach((cocktail, i) => {
         const card = document.createElement('div');
         card.className = 'card';
+
         const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
         card.innerHTML = `
           <h2>${cocktail.title}</h2>
-          <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
@@ -178,61 +177,74 @@
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
+
+        if (isAdmin) {
+          const btn = document.createElement('button');
+          btn.textContent = 'Edit';
+          btn.className = 'edit-btn';
+          btn.onclick = () => openModal(i);
+          card.appendChild(btn);
+        }
+
         container.appendChild(card);
       });
     }
 
-    function openEdit(index) {
-      editingIndex = index;
-      const c = currentCocktails[index];
-      document.getElementById('editTitle').value = c.title || '';
+    function openModal(i) {
+      currentEditIndex = i;
+      const c = cocktails[i];
+      document.getElementById('editTitle').value = c.title;
       document.getElementById('editIngredients').value = c.ingredients?.join(', ') || '';
       document.getElementById('editGlassware').value = c.glassware || '';
       document.getElementById('editMethod').value = c.method || '';
       document.getElementById('editProTip').value = c.pro_tip || '';
       document.getElementById('editDidYouKnow').value = c.did_you_know || '';
       document.getElementById('editTag').value = c.tag || '';
-      document.getElementById('modal').style.display = 'flex';
+      document.getElementById('editModal').style.display = 'flex';
     }
 
-    document.getElementById('saveEdit').addEventListener('click', async () => {
-      const c = currentCocktails[editingIndex];
-      c.title = document.getElementById('editTitle').value;
-      c.ingredients = document.getElementById('editIngredients').value.split(',').map(i => i.trim());
-      c.glassware = document.getElementById('editGlassware').value;
-      c.method = document.getElementById('editMethod').value;
-      c.pro_tip = document.getElementById('editProTip').value;
-      c.did_you_know = document.getElementById('editDidYouKnow').value;
-      c.tag = document.getElementById('editTag').value;
-      document.getElementById('modal').style.display = 'none';
-      displayCocktails(currentCocktails);
+    function hideModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function saveEdit() {
+      if (!isAdmin || currentEditIndex === null) return;
+      const updated = cocktails[currentEditIndex];
+      updated.title = document.getElementById('editTitle').value;
+      updated.ingredients = document.getElementById('editIngredients').value.split(',').map(x => x.trim());
+      updated.glassware = document.getElementById('editGlassware').value;
+      updated.method = document.getElementById('editMethod').value;
+      updated.pro_tip = document.getElementById('editProTip').value;
+      updated.did_you_know = document.getElementById('editDidYouKnow').value;
+      updated.tag = document.getElementById('editTag').value;
+
       try {
-        await fetch('/.netlify/functions/save-cocktail-data', {
+        const res = await fetch('/.netlify/functions/saveCocktailDrive', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(currentCocktails)
+          body: JSON.stringify(cocktails)
         });
-        document.getElementById('saveSuccess').textContent = 'Saved successfully!';
-        setTimeout(() => document.getElementById('saveSuccess').textContent = '', 2000);
+        if (res.ok) {
+          hideModal();
+          displayCocktails(cocktails);
+          alert('Saved successfully.');
+        } else {
+          alert('Failed to save.');
+        }
       } catch (err) {
-        console.error('Failed to save to Drive:', err);
+        console.error(err);
+        alert('Error saving.');
       }
-    });
-
-    function generatePdf(cocktails) {
-      const content = cocktails.map(c => `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`).join('\n');
-      const blob = new Blob([content], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'cocktail_cards.txt';
-      link.click();
     }
 
+    document.getElementById('saveEdit').addEventListener('click', saveEdit);
+
     async function init() {
-      currentCocktails = await fetchCocktails();
-      if (currentCocktails.length === 0) return;
-      displayCocktails(currentCocktails);
-      const tags = [...new Set(currentCocktails.map(c => c.tag || 'Uncategorised'))];
+      cocktails = await fetchCocktails();
+      if (cocktails.length === 0) return;
+      displayCocktails(cocktails);
+
+      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
       tags.forEach(tag => {
         const option = document.createElement('option');
@@ -240,17 +252,20 @@
         option.textContent = tag;
         tagFilter.appendChild(option);
       });
-      document.getElementById('searchInput').addEventListener('input', e => {
-        const q = e.target.value.toLowerCase();
-        const filtered = currentCocktails.filter(c => c.title.toLowerCase().includes(q));
+
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = cocktails.filter(c => c.title.toLowerCase().includes(query));
         displayCocktails(filtered);
       });
-      tagFilter.addEventListener('change', e => {
-        const val = e.target.value;
-        const filtered = val ? currentCocktails.filter(c => c.tag === val) : currentCocktails;
+
+      tagFilter.addEventListener('change', (e) => {
+        const selected = e.target.value;
+        const filtered = selected
+          ? cocktails.filter(c => c.tag === selected)
+          : cocktails;
         displayCocktails(filtered);
       });
-      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(currentCocktails));
     }
 
     init();
