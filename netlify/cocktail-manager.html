@@ -61,6 +61,17 @@
     .card h2 {
       margin-top: 0;
     }
+    .edit-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #f9a825;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
     .highlight {
       font-weight: bold;
       color: #f9a825;
@@ -69,16 +80,28 @@
       color: red;
       text-align: center;
     }
-    .edit-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background-color: #f9a825;
-      border: none;
-      padding: 0.3rem 0.6rem;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    #modalContent {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 400px;
+    }
+    #modalContent label {
+      display: block;
+      margin-top: 1rem;
+    }
+    #saveSuccess {
+      color: green;
+      text-align: center;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -98,13 +121,32 @@
       <select id="tagFilter">
         <option value="">All Tags</option>
       </select>
-      <button id="downloadPdfBtn">Download TXT</button>
+      <button id="downloadPdfBtn">Download PDF</button>
     </div>
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
   </main>
+
+  <div id="modal">
+    <div id="modalContent">
+      <h2>Edit Cocktail</h2>
+      <label>Title: <input type="text" id="editTitle" /></label>
+      <label>Ingredients (comma-separated): <input type="text" id="editIngredients" /></label>
+      <label>Glassware: <input type="text" id="editGlassware" /></label>
+      <label>Method: <input type="text" id="editMethod" /></label>
+      <label>Pro Tip: <input type="text" id="editProTip" /></label>
+      <label>Did You Know: <input type="text" id="editDidYouKnow" /></label>
+      <label>Category: <input type="text" id="editTag" /></label>
+      <button id="saveEdit">Save</button>
+      <button onclick="document.getElementById('modal').style.display='none'">Cancel</button>
+      <div id="saveSuccess"></div>
+    </div>
+  </div>
+
   <script>
     const DATA_PATH = '/data/cocktail_data_backup.json';
+    let currentCocktails = [];
+    let editingIndex = null;
 
     async function fetchCocktails() {
       try {
@@ -122,67 +164,93 @@
     function displayCocktails(cocktails) {
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
-
       cocktails.forEach((cocktail, index) => {
         const card = document.createElement('div');
         card.className = 'card';
-
         const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
-        const proTip = cocktail.pro_tip || '—';
-
         card.innerHTML = `
           <h2>${cocktail.title}</h2>
+          <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
-          <p><span class="highlight">Pro Tip:</span> ${proTip}</p>
+          <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
-
         container.appendChild(card);
       });
     }
 
-    async function init() {
-      const cocktails = await fetchCocktails();
-      if (cocktails.length === 0) return;
-      displayCocktails(cocktails);
+    function openEdit(index) {
+      editingIndex = index;
+      const c = currentCocktails[index];
+      document.getElementById('editTitle').value = c.title || '';
+      document.getElementById('editIngredients').value = c.ingredients?.join(', ') || '';
+      document.getElementById('editGlassware').value = c.glassware || '';
+      document.getElementById('editMethod').value = c.method || '';
+      document.getElementById('editProTip').value = c.pro_tip || '';
+      document.getElementById('editDidYouKnow').value = c.did_you_know || '';
+      document.getElementById('editTag').value = c.tag || '';
+      document.getElementById('modal').style.display = 'flex';
+    }
 
+    document.getElementById('saveEdit').addEventListener('click', async () => {
+      const c = currentCocktails[editingIndex];
+      c.title = document.getElementById('editTitle').value;
+      c.ingredients = document.getElementById('editIngredients').value.split(',').map(i => i.trim());
+      c.glassware = document.getElementById('editGlassware').value;
+      c.method = document.getElementById('editMethod').value;
+      c.pro_tip = document.getElementById('editProTip').value;
+      c.did_you_know = document.getElementById('editDidYouKnow').value;
+      c.tag = document.getElementById('editTag').value;
+      document.getElementById('modal').style.display = 'none';
+      displayCocktails(currentCocktails);
+      try {
+        await fetch('/.netlify/functions/save-cocktail-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentCocktails)
+        });
+        document.getElementById('saveSuccess').textContent = 'Saved successfully!';
+        setTimeout(() => document.getElementById('saveSuccess').textContent = '', 2000);
+      } catch (err) {
+        console.error('Failed to save to Drive:', err);
+      }
+    });
+
+    function generatePdf(cocktails) {
+      const content = cocktails.map(c => `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`).join('\n');
+      const blob = new Blob([content], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'cocktail_cards.txt';
+      link.click();
+    }
+
+    async function init() {
+      currentCocktails = await fetchCocktails();
+      if (currentCocktails.length === 0) return;
+      displayCocktails(currentCocktails);
+      const tags = [...new Set(currentCocktails.map(c => c.tag || 'Uncategorised'))];
       const tagFilter = document.getElementById('tagFilter');
-      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
       tags.forEach(tag => {
         const option = document.createElement('option');
         option.value = tag;
         option.textContent = tag;
         tagFilter.appendChild(option);
       });
-
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const filtered = cocktails.filter(c => c.title.toLowerCase().includes(query));
+      document.getElementById('searchInput').addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        const filtered = currentCocktails.filter(c => c.title.toLowerCase().includes(q));
         displayCocktails(filtered);
       });
-
-      tagFilter.addEventListener('change', (e) => {
-        const selected = e.target.value;
-        const filtered = selected
-          ? cocktails.filter(c => c.tag === selected)
-          : cocktails;
+      tagFilter.addEventListener('change', e => {
+        const val = e.target.value;
+        const filtered = val ? currentCocktails.filter(c => c.tag === val) : currentCocktails;
         displayCocktails(filtered);
       });
-
-      document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-        const content = cocktails.map(c => {
-          return `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`;
-        }).join('\n');
-
-        const blob = new Blob([content], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'cocktail_cards.txt';
-        link.click();
-      });
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => generatePdf(currentCocktails));
     }
 
     init();
