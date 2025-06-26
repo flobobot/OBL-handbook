@@ -1,5 +1,4 @@
 const { google } = require('googleapis');
-const { GoogleAuth } = require('google-auth-library');
 const { Readable } = require('stream');
 
 exports.handler = async function(event, context) {
@@ -11,19 +10,26 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const auth = new GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/drive']
+    const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
+    if (!credentialsBase64) {
+      throw new Error('Missing GOOGLE_CREDENTIALS_BASE64 environment variable');
+    }
+
+    const credentials = JSON.parse(Buffer.from(credentialsBase64, 'base64').toString('utf-8'));
+
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/drive'],
     });
 
     const drive = google.drive({ version: 'v3', auth });
 
-    const fileId = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL'; // Replace with your real file ID
+    const fileId = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL'; // 🔁 YOUR FILE ID
     const jsonContent = event.body;
 
-    // Convert string to a stream
     const stream = new Readable();
     stream.push(jsonContent);
-    stream.push(null); // End the stream
+    stream.push(null);
 
     await drive.files.update({
       fileId,
@@ -35,13 +41,14 @@ exports.handler = async function(event, context) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'File saved successfully to Google Drive.' })
+      body: JSON.stringify({ message: 'Saved to Google Drive' })
     };
+
   } catch (error) {
     console.error('Drive Save Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to save file to Google Drive.', error: error.message })
+      body: JSON.stringify({ message: 'Failed to save', error: error.message })
     };
   }
 };
