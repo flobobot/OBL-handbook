@@ -139,7 +139,7 @@
   </div>
 
   <script>
-    const DATA_PATH = '/data/cocktail_data_backup.json';
+    const DATA_PATH = '/.netlify/functions/load-cocktail-data';
     let currentEditIndex = null;
     let cocktails = [];
 
@@ -196,7 +196,7 @@
       document.getElementById('editModal').style.display = 'none';
     }
 
-    document.getElementById('saveEdit').addEventListener('click', () => {
+    document.getElementById('saveEdit').addEventListener('click', async () => {
       const updated = {
         title: document.getElementById('editTitle').value,
         ingredients: document.getElementById('editIngredients').value.split(',').map(i => i.trim()),
@@ -209,7 +209,18 @@
       cocktails[currentEditIndex] = updated;
       closeModal();
       displayCocktails(cocktails);
-      console.log('Updated cocktail:', updated);
+
+      try {
+        await fetch('/.netlify/functions/save-cocktail-drive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cocktails)
+        });
+        alert('Saved to Google Drive!');
+      } catch (err) {
+        console.error('Failed to save:', err);
+        alert('Save failed! Check console.');
+      }
     });
 
     async function init() {
