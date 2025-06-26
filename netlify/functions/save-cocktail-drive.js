@@ -1,46 +1,41 @@
 const { google } = require('googleapis');
-const path = require('path');
-const fs = require('fs');
+const { GoogleAuth } = require('google-auth-library');
 
-exports.handler = async function(event) {
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: 'Method Not Allowed',
+    };
+  }
+
   try {
-    if (event.httpMethod !== 'POST') {
-      return {
-        statusCode: 405,
-        body: 'Method Not Allowed',
-      };
-    }
-
-    const credentialsPath = path.resolve(__dirname, 'flobocorp-automation-3ac38a3f9c31.json');
-    const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'));
-
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ['https://www.googleapis.com/auth/drive.file'],
+    const auth = new GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/drive']
     });
 
     const drive = google.drive({ version: 'v3', auth });
 
-    const fileId = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL';
-
-    const updatedData = event.body;
+    const fileId = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL'; // your correct file ID
+    const body = event.body;
 
     await drive.files.update({
       fileId,
       media: {
         mimeType: 'application/json',
-        body: updatedData,
+        body,
       },
     });
 
     return {
       statusCode: 200,
-      body: 'Cocktail data updated successfully',
+      body: JSON.stringify({ message: 'File saved successfully to Google Drive.' })
     };
-  } catch (err) {
+  } catch (error) {
+    console.error('Drive Save Error:', error);
     return {
       statusCode: 500,
-      body: `Failed to save cocktail data: ${err.message}`,
+      body: JSON.stringify({ message: 'Failed to save file to Google Drive.' })
     };
   }
 };
