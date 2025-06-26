@@ -58,8 +58,17 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: relative;
     }
-    .card h2 {
-      margin-top: 0;
+    .edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f9a825;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
     }
     .highlight {
       font-weight: bold;
@@ -69,16 +78,26 @@
       color: red;
       text-align: center;
     }
-    .edit-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: orange;
-      border: none;
-      border-radius: 6px;
-      padding: 0.3rem 0.6rem;
-      color: white;
-      cursor: pointer;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
@@ -103,9 +122,26 @@
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
   </main>
+
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Cocktail</h2>
+      <input id="editTitle" placeholder="Title" />
+      <textarea id="editIngredients" placeholder="Ingredients (comma-separated)"></textarea>
+      <input id="editGlassware" placeholder="Glassware" />
+      <input id="editMethod" placeholder="Method" />
+      <input id="editProTip" placeholder="Pro Tip" />
+      <input id="editDidYouKnow" placeholder="Did You Know" />
+      <input id="editTag" placeholder="Category" />
+      <button id="saveEdit">Save</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
   <script>
     const DATA_PATH = '/data/cocktail_data_backup.json';
-    let isAdmin = true; // Dev mode toggle: assume admin session is active
+    let currentEditIndex = null;
+    let cocktails = [];
 
     async function fetchCocktails() {
       try {
@@ -120,18 +156,18 @@
       }
     }
 
-    function displayCocktails(cocktails) {
+    function displayCocktails(cocktailsList) {
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
 
-      cocktails.forEach((cocktail, index) => {
+      cocktailsList.forEach((cocktail, index) => {
         const card = document.createElement('div');
         card.className = 'card';
 
         const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
         card.innerHTML = `
+          <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <h2>${cocktail.title}</h2>
-          ${isAdmin ? `<button class="edit-btn" onclick="openEditModal(${index})">Edit</button>` : ''}
           <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
@@ -139,13 +175,45 @@
           <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
-
         container.appendChild(card);
       });
     }
 
+    function openEdit(index) {
+      currentEditIndex = index;
+      const cocktail = cocktails[index];
+      document.getElementById('editTitle').value = cocktail.title;
+      document.getElementById('editIngredients').value = cocktail.ingredients?.join(', ') || '';
+      document.getElementById('editGlassware').value = cocktail.glassware || '';
+      document.getElementById('editMethod').value = cocktail.method || '';
+      document.getElementById('editProTip').value = cocktail.pro_tip || '';
+      document.getElementById('editDidYouKnow').value = cocktail.did_you_know || '';
+      document.getElementById('editTag').value = cocktail.tag || '';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    document.getElementById('saveEdit').addEventListener('click', () => {
+      const updated = {
+        title: document.getElementById('editTitle').value,
+        ingredients: document.getElementById('editIngredients').value.split(',').map(i => i.trim()),
+        glassware: document.getElementById('editGlassware').value,
+        method: document.getElementById('editMethod').value,
+        pro_tip: document.getElementById('editProTip').value,
+        did_you_know: document.getElementById('editDidYouKnow').value,
+        tag: document.getElementById('editTag').value
+      };
+      cocktails[currentEditIndex] = updated;
+      closeModal();
+      displayCocktails(cocktails);
+      console.log('Updated cocktail:', updated);
+    });
+
     async function init() {
-      const cocktails = await fetchCocktails();
+      cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
 
