@@ -4,8 +4,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const FILE_ID = '1wnbUDegCpxasLQgOY-fpa-0ZC9WhZrJp'; // Main JSON file
-const BACKUP_FOLDER_ID = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR'; // Frontend backup folder
+// ✅ Replace with correct file ID of cocktail_data_backup.json
+const FILE_ID = '1ZZJqLaF3uFxFJSWgGLzRP6h0wABUnq-v'; // ← Replace this with the actual working file ID
+const BACKUP_FOLDER_ID = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR';
 
 exports.handler = async function (event, context) {
   try {
@@ -20,18 +21,18 @@ exports.handler = async function (event, context) {
 
     const drive = google.drive({ version: 'v3', auth });
 
-    // 1. Get live file contents
+    // 1. Download live data file
     const originalFile = await drive.files.get({
       fileId: FILE_ID,
       alt: 'media',
     });
 
-    // 2. Write to temp file
+    // 2. Write backup locally
     const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
     const tempFilePath = path.join(os.tmpdir(), `backup-${timestamp}.json`);
     fs.writeFileSync(tempFilePath, JSON.stringify(originalFile.data, null, 2));
 
-    // 3. Upload to Drive using fs.createReadStream()
+    // 3. Upload to Drive
     const uploadResponse = await drive.files.create({
       requestBody: {
         name: `backup-${timestamp}.json`,
@@ -44,7 +45,7 @@ exports.handler = async function (event, context) {
       },
     });
 
-    // 4. List and purge older backups
+    // 4. Purge older backups beyond 5
     const listResponse = await drive.files.list({
       q: `'${BACKUP_FOLDER_ID}' in parents and name contains 'backup-' and trashed = false`,
       fields: 'files(id, name, createdTime)',
