@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Module</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1c1c1c;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    .section h3 {
+      color: #f9a825;
+    }
+    .section p {
+      line-height: 1.6;
+    }
+    .complete-btn {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+      margin: 2rem auto 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>OBL Training</strong></div>
+    <nav>
+      <a href="training.html">Back to Training</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 id="moduleTitle">Module Title</h1>
+
+    <div class="section">
+      <h3>What You'll Learn</h3>
+      <p>This module covers the core knowledge and skills for this area.</p>
+    </div>
+
+    <div class="section">
+      <h3>Content</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vehicula ligula at justo vehicula, a fermentum ipsum gravida.</p>
+    </div>
+
+    <div class="section">
+      <h3>Assessment</h3>
+      <p>Once you've read the material, click the button below to complete this module.</p>
+    </div>
+
+    <button class="complete-btn" onclick="completeModule()">Mark as Complete</button>
+  </main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const moduleId = urlParams.get('id');
+
+    document.getElementById('moduleTitle').textContent = moduleId ? `Training Module: ${moduleId}` : 'Training Module';
+
+    function completeModule() {
+      if (moduleId) {
+        localStorage.setItem(`completed_${moduleId}`, 'true');
+        alert(`Module '${moduleId}' marked as complete!`);
+        window.location.href = 'training.html';
+      } else {
+        alert('Module ID missing.');
+      }
+    }
+  </script>
+</body>
+</html>
