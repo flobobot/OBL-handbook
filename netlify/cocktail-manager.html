@@ -59,10 +59,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: relative;
     }
-    .card ul {
-      margin-top: 0.25rem;
-      margin-bottom: 1rem;
-    }
     .edit-btn {
       position: absolute;
       top: 10px;
@@ -173,12 +169,11 @@
         const card = document.createElement('div');
         card.className = 'card';
 
-        const ingredientsList = (cocktail.ingredients || []).map(i => `<li>${i}</li>`).join('');
-
+        const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
         card.innerHTML = `
           <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <h2>${cocktail.title}</h2>
-          <p><span class="highlight">Ingredients:</span></p><ul>${ingredientsList}</ul>
+          <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
           <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
@@ -277,21 +272,33 @@
       document.getElementById('downloadPdfBtn').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const maxWidth = 180;
+        let y = 20;
 
         displayedCocktails.forEach((c, index) => {
+          y = 20;
           doc.setFontSize(14);
-          doc.text(`Cocktail: ${c.title}`, 10, 20);
+          doc.text(`Cocktail: ${c.title}`, 10, y);
           doc.setFontSize(12);
-          let y = 30;
-          (c.ingredients || []).forEach((ing, i) => {
-            doc.text(`• ${ing}`, 12, y);
+          y += 10;
+          (c.ingredients || []).forEach(i => {
+            doc.text(`• ${i}`, 12, y);
             y += 8;
           });
-          doc.text(`Glassware: ${c.glassware || '—'}`, 10, y += 8);
-          doc.text(`Method: ${c.method || '—'}`, 10, y += 8);
-          doc.text(`Pro Tip: ${c.pro_tip || '—'}`, 10, y += 8);
-          doc.text(`Did You Know: ${c.did_you_know || '—'}`, 10, y += 8);
-          doc.text(`Category: ${c.tag || 'Uncategorised'}`, 10, y += 8);
+
+          const fields = [
+            ['Glassware', c.glassware],
+            ['Method', c.method],
+            ['Pro Tip', c.pro_tip],
+            ['Did You Know', c.did_you_know],
+            ['Category', c.tag || 'Uncategorised']
+          ];
+
+          fields.forEach(([label, text]) => {
+            const wrapped = doc.splitTextToSize(`${label}: ${text || '—'}`, maxWidth);
+            doc.text(wrapped, 10, y);
+            y += wrapped.length * 8;
+          });
 
           if (index < displayedCocktails.length - 1) doc.addPage();
         });
