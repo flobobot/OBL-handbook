@@ -1,121 +1,72 @@
 const { google } = require('googleapis');
-const { Buffer } = require('buffer');
+const { GoogleAuth } = require('google-auth-library');
 
-const FILE_NAME = 'cocktail_data_backup.json';
-const BACKUP_PREFIX = 'cocktail_data_backup_';
-const BACKUP_FOLDER_NAME = 'OBL-handbook-backups'; // Folder that holds backups
+const FILE_ID = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL'; // Live data file
+const BACKUP_FOLDER_ID = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR'; // Frontend backup folder
 
-exports.handler = async function(event) {
+exports.handler = async function (event, context) {
   try {
-    // Require level 4/5 header token — optional phase 2
-    if (event.httpMethod !== 'POST') {
-      return {
-        statusCode: 405,
-        body: 'Method Not Allowed',
-      };
-    }
+    const auth = new GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/drive'],
+    });
+    const authClient = await auth.getClient();
+    const drive = google.drive({ version: 'v3', auth: authClient });
 
-    // Load and parse service account credentials
-    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDS);
-    const scopes = ['https://www.googleapis.com/auth/drive'];
-    const auth = new google.auth.JWT(
-      credentials.client_email,
-      null,
-      credentials.private_key,
-      scopes
-    );
-    const drive = google.drive({ version: 'v3', auth });
-
-    // Step 1: Find main JSON file
-    const { data: list } = await drive.files.list({
-      q: `name = '${FILE_NAME}' and trashed = false`,
-      fields: 'files(id, name, parents)',
+    // 1. Get original file metadata
+    const originalFile = await drive.files.get({
+      fileId: FILE_ID,
+      fields: 'name, mimeType',
     });
 
-    if (list.files.length === 0) {
-      return {
-        statusCode: 404,
-        body: 'Backup source file not found',
-      };
-    }
-
-    const sourceFile = list.files[0];
-
-    // Step 2: Download file content
-    const contentRes = await drive.files.get(
-      { fileId: sourceFile.id, alt: 'media' },
+    // 2. Download original content
+    const fileContent = await drive.files.get(
+      { fileId: FILE_ID, alt: 'media' },
       { responseType: 'stream' }
     );
 
-    let content = '';
-    await new Promise((resolve, reject) => {
-      contentRes.data
-        .on('data', chunk => content += chunk)
-        .on('end', resolve)
-        .on('error', reject);
-    });
-
-    // Step 3: Get/create backup folder
-    const folderRes = await drive.files.list({
-      q: `name = '${BACKUP_FOLDER_NAME}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-      fields: 'files(id)',
-    });
-
-    let backupFolderId;
-    if (folderRes.files.length === 0) {
-      const folder = await drive.files.create({
-        resource: {
-          name: BACKUP_FOLDER_NAME,
-          mimeType: 'application/vnd.google-apps.folder',
-        },
-        fields: 'id',
-      });
-      backupFolderId = folder.data.id;
-    } else {
-      backupFolderId = folderRes.files[0].id;
-    }
-
-    // Step 4: Create timestamped backup file
+    // 3. Create backup filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupFileName = `${BACKUP_PREFIX}${timestamp}.json`;
+    const backupName = `cocktail_data_backup_${timestamp}.json`;
 
-    await drive.files.create({
-      resource: {
-        name: backupFileName,
-        parents: [backupFolderId],
-        mimeType: 'application/json',
+    // 4. Upload as new backup file
+    const backupRes = await drive.files.create({
+      requestBody: {
+        name: backupName,
+        mimeType: originalFile.data.mimeType,
+        parents: [BACKUP_FOLDER_ID],
       },
       media: {
-        mimeType: 'application/json',
-        body: content,
+        mimeType: originalFile.data.mimeType,
+        body: fileContent.data,
       },
     });
 
-    // Step 5: Prune older backups (keep last 5)
-    const backups = await drive.files.list({
-      q: `'${backupFolderId}' in parents and name contains '${BACKUP_PREFIX}' and trashed = false`,
+    // 5. Enforce max of 5 backups: list, sort, delete oldest
+    const list = await drive.files.list({
+      q: `'${BACKUP_FOLDER_ID}' in parents and mimeType='application/json'`,
       fields: 'files(id, name, createdTime)',
     });
 
-    const sorted = backups.data.files.sort(
-      (a, b) => new Date(b.createdTime) - new Date(a.createdTime)
+    const files = list.data.files.sort((a, b) =>
+      new Date(b.createdTime) - new Date(a.createdTime)
     );
 
-    const excess = sorted.slice(5);
-    for (const file of excess) {
-      await drive.files.delete({ fileId: file.id });
+    if (files.length > 5) {
+      const toDelete = files.slice(5);
+      for (let file of toDelete) {
+        await drive.files.delete({ fileId: file.id });
+      }
     }
 
     return {
       statusCode: 200,
-      body: `✅ Backup created: ${backupFileName}`,
+      body: JSON.stringify({ message: 'Backup created and old backups purged.' }),
     };
-
-  } catch (err) {
-    console.error('❌ Backup failed:', err);
+  } catch (error) {
+    console.error('Backup error:', error);
     return {
       statusCode: 500,
-      body: 'Internal Server Error: ' + err.message,
+      body: JSON.stringify({ message: 'Backup failed.', error: error.message }),
     };
   }
 };
