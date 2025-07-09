@@ -59,6 +59,10 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: relative;
     }
+    .card ul {
+      margin-top: 0.25rem;
+      margin-bottom: 1rem;
+    }
     .edit-btn {
       position: absolute;
       top: 10px;
@@ -99,10 +103,6 @@
     .modal-content input, .modal-content textarea {
       width: 100%;
       margin-bottom: 1rem;
-    }
-    ul.ingredient-list {
-      padding-left: 20px;
-      margin: 0.5rem 0 1rem;
     }
   </style>
 </head>
@@ -173,24 +173,134 @@
         const card = document.createElement('div');
         card.className = 'card';
 
-        const ingredientsHTML = (cocktail.ingredients || []).map(ing => `<li>${ing}</li>`).join('');
+        const ingredientsList = (cocktail.ingredients || []).map(i => `<li>${i}</li>`).join('');
 
         card.innerHTML = `
           <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <h2>${cocktail.title}</h2>
-          <p><span class="highlight">Ingredients:</span></p>
-          <ul class="ingredient-list">${ingredientsHTML}</ul>
+          <p><span class="highlight">Ingredients:</span></p><ul>${ingredientsList}</ul>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
-          <p><span class="highlight">Method:</span><br>${cocktail.method || 'N/A'}</p>
-          <p><span class="highlight">Pro Tip:</span><br>${cocktail.pro_tip || '—'}</p>
-          <p><span class="highlight">Did You Know:</span><br>${cocktail.did_you_know || '—'}</p>
+          <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
+          <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
+          <p><span class="highlight">Did You Know:</span> ${cocktail.did_you_know || '—'}</p>
           <p><span class="highlight">Category:</span> ${cocktail.tag || 'Uncategorised'}</p>
         `;
         container.appendChild(card);
       });
     }
 
-    // other script logic remains unchanged
+    function openEdit(index) {
+      currentEditIndex = index;
+      const cocktail = cocktails[index];
+      document.getElementById('editTitle').value = cocktail.title;
+      document.getElementById('editIngredients').value = cocktail.ingredients?.join(', ') || '';
+      document.getElementById('editGlassware').value = cocktail.glassware || '';
+      document.getElementById('editMethod').value = cocktail.method || '';
+      document.getElementById('editProTip').value = cocktail.pro_tip || '';
+      document.getElementById('editDidYouKnow').value = cocktail.did_you_know || '';
+      document.getElementById('editTag').value = cocktail.tag || '';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    document.getElementById('saveEdit').addEventListener('click', async () => {
+      const updated = {
+        title: document.getElementById('editTitle').value,
+        ingredients: document.getElementById('editIngredients').value.split(',').map(i => i.trim()),
+        glassware: document.getElementById('editGlassware').value,
+        method: document.getElementById('editMethod').value,
+        pro_tip: document.getElementById('editProTip').value,
+        did_you_know: document.getElementById('editDidYouKnow').value,
+        tag: document.getElementById('editTag').value
+      };
+      cocktails[currentEditIndex] = updated;
+      closeModal();
+      displayCocktails(cocktails);
+
+      try {
+        await fetch('/.netlify/functions/save-cocktail-drive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cocktails)
+        });
+        alert('Saved to Google Drive!');
+      } catch (err) {
+        console.error('Failed to save:', err);
+        alert('Save failed! Check console.');
+      }
+    });
+
+    async function init() {
+      if (isAdmin) {
+        document.getElementById('backupBtn').style.display = 'inline-block';
+        document.getElementById('backupBtn').addEventListener('click', async () => {
+          try {
+            await fetch('/.netlify/functions/backup-cocktail-data', { method: 'POST' });
+            alert('Backup created successfully.');
+          } catch (err) {
+            console.error('Backup failed:', err);
+            alert('Backup failed. See console for details.');
+          }
+        });
+      }
+
+      cocktails = await fetchCocktails();
+      if (cocktails.length === 0) return;
+      displayCocktails(cocktails);
+
+      const tags = [...new Set(cocktails.map(c => c.tag || 'Uncategorised'))];
+      const tagFilter = document.getElementById('tagFilter');
+      tags.forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag;
+        option.textContent = tag;
+        tagFilter.appendChild(option);
+      });
+
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = cocktails.filter(c => c.title.toLowerCase().includes(query));
+        displayCocktails(filtered);
+      });
+
+      tagFilter.addEventListener('change', (e) => {
+        const selected = e.target.value;
+        const filtered = selected
+          ? cocktails.filter(c => c.tag === selected)
+          : cocktails;
+        displayCocktails(filtered);
+      });
+
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        displayedCocktails.forEach((c, index) => {
+          doc.setFontSize(14);
+          doc.text(`Cocktail: ${c.title}`, 10, 20);
+          doc.setFontSize(12);
+          let y = 30;
+          (c.ingredients || []).forEach((ing, i) => {
+            doc.text(`• ${ing}`, 12, y);
+            y += 8;
+          });
+          doc.text(`Glassware: ${c.glassware || '—'}`, 10, y += 8);
+          doc.text(`Method: ${c.method || '—'}`, 10, y += 8);
+          doc.text(`Pro Tip: ${c.pro_tip || '—'}`, 10, y += 8);
+          doc.text(`Did You Know: ${c.did_you_know || '—'}`, 10, y += 8);
+          doc.text(`Category: ${c.tag || 'Uncategorised'}`, 10, y += 8);
+
+          if (index < displayedCocktails.length - 1) doc.addPage();
+        });
+
+        doc.save('cocktail_cards.pdf');
+      });
+    }
+
+    init();
   </script>
 </body>
 </html>
