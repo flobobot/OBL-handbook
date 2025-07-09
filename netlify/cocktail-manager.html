@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Old Blue Last Cocktail Manager</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
@@ -141,7 +142,7 @@
 
   <script>
     const DATA_PATH = '/.netlify/functions/load-cocktail-data';
-    const isAdmin = true; // Toggle manually for now — later replaced by auth logic
+    const isAdmin = true;
     let currentEditIndex = null;
     let cocktails = [];
 
@@ -267,12 +268,21 @@
       });
 
       document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-        const content = cocktails.map(c => `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ')}\nGlassware: ${c.glassware}\nMethod: ${c.method}\nPro Tip: ${c.pro_tip}\nDid You Know: ${c.did_you_know}\nCategory: ${c.tag}\n\n`).join('\n');
-        const blob = new Blob([content], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'cocktail_cards.txt';
-        link.click();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 10;
+
+        cocktails.forEach((c, index) => {
+          const block = `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ') || '—'}\nGlassware: ${c.glassware || '—'}\nMethod: ${c.method || '—'}\nPro Tip: ${c.pro_tip || '—'}\nDid You Know: ${c.did_you_know || '—'}\nCategory: ${c.tag || 'Uncategorised'}\n`;
+          doc.text(block, 10, y);
+          y += 60;
+          if (y > 270 && index < cocktails.length - 1) {
+            doc.addPage();
+            y = 10;
+          }
+        });
+
+        doc.save('cocktail_cards.pdf');
       });
     }
 
