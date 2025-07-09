@@ -118,6 +118,7 @@
         <option value="">All Tags</option>
       </select>
       <button id="downloadPdfBtn">Download PDF</button>
+      <button id="backupBtn" style="display: none">Backup Now</button>
     </div>
     <div id="error" class="error"></div>
     <div id="cocktailCards" class="cards"></div>
@@ -140,6 +141,7 @@
 
   <script>
     const DATA_PATH = '/.netlify/functions/load-cocktail-data';
+    const isAdmin = true; // Toggle manually for now — later replaced by auth logic
     let currentEditIndex = null;
     let cocktails = [];
 
@@ -224,6 +226,19 @@
     });
 
     async function init() {
+      if (isAdmin) {
+        document.getElementById('backupBtn').style.display = 'inline-block';
+        document.getElementById('backupBtn').addEventListener('click', async () => {
+          try {
+            await fetch('/.netlify/functions/backup-cocktail-data', { method: 'POST' });
+            alert('Backup created successfully.');
+          } catch (err) {
+            console.error('Backup failed:', err);
+            alert('Backup failed. See console for details.');
+          }
+        });
+      }
+
       cocktails = await fetchCocktails();
       if (cocktails.length === 0) return;
       displayCocktails(cocktails);
