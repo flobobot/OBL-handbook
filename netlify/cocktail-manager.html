@@ -169,11 +169,17 @@
         const card = document.createElement('div');
         card.className = 'card';
 
-        const ingredients = cocktail.ingredients?.join(', ') || 'N/A';
+        const ingredientsList = (cocktail.ingredients || [])
+          .map(i => `<li>${i}</li>`)
+          .join('');
+        const ingredientsHTML = ingredientsList
+          ? `<ul style="margin-top: 0.25rem;">${ingredientsList}</ul>`
+          : 'N/A';
+
         card.innerHTML = `
           <button class="edit-btn" onclick="openEdit(${index})">Edit</button>
           <h2>${cocktail.title}</h2>
-          <p><span class="highlight">Ingredients:</span> ${ingredients}</p>
+          <p><span class="highlight">Ingredients:</span>${ingredientsHTML}</p>
           <p><span class="highlight">Glassware:</span> ${cocktail.glassware || 'N/A'}</p>
           <p><span class="highlight">Method:</span> ${cocktail.method || 'N/A'}</p>
           <p><span class="highlight">Pro Tip:</span> ${cocktail.pro_tip || '—'}</p>
