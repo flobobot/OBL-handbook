@@ -1,19 +1,26 @@
 const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
 
-const auth = new GoogleAuth({
-  scopes: ['https://www.googleapis.com/auth/drive']
-});
-
 exports.handler = async function (event, context) {
   try {
+    // Load and parse base64-encoded credentials from environment variable
+    const base64Creds = process.env.GOOGLE_CREDENTIALS_BASE64;
+    if (!base64Creds) throw new Error('Missing GOOGLE_CREDENTIALS_BASE64 env variable');
+
+    const credentials = JSON.parse(Buffer.from(base64Creds, 'base64').toString('utf8'));
+
+    const auth = new GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/drive']
+    });
+
     const client = await auth.getClient();
     const drive = google.drive({ version: 'v3', auth: client });
 
-    // Folder ID for frontend-backup
+    // Folder ID: frontend-backups
     const folderId = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR';
 
-    // Get file list in backup folder
+    // Get current backup files
     const listResponse = await drive.files.list({
       q: `'${folderId}' in parents and name contains 'cocktail_data_backup' and trashed = false`,
       fields: 'files(id, name, createdTime)',
@@ -22,26 +29,24 @@ exports.handler = async function (event, context) {
 
     const files = listResponse.data.files;
 
-    // Keep only 5 most recent
+    // Delete old backups beyond 5 most recent
     if (files.length >= 5) {
-      const filesToDelete = files.slice(5);
-      for (const file of filesToDelete) {
+      const toDelete = files.slice(5);
+      for (const file of toDelete) {
         await drive.files.delete({ fileId: file.id });
       }
     }
 
-    // Create timestamped filename
+    // Get current JSON from live Netlify site
+    const res = await fetch('https://obl-bartender-portal.netlify.app/data/cocktail_data_backup.json');
+    const data = await res.json();
+    const buffer = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+
+    // Upload new backup
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `cocktail_data_backup_${timestamp}.json`;
 
-    // Read current JSON
-    const res = await fetch('https://obl-bartender-portal.netlify.app/data/cocktail_data_backup.json');
-    const cocktailData = await res.json();
-
-    const buffer = Buffer.from(JSON.stringify(cocktailData, null, 2), 'utf-8');
-
-    // Upload new file
-    const uploadRes = await drive.files.create({
+    const upload = await drive.files.create({
       requestBody: {
         name: fileName,
         mimeType: 'application/json',
@@ -55,13 +60,13 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Backup created', fileId: uploadRes.data.id })
+      body: JSON.stringify({ message: 'Backup created successfully', fileId: upload.data.id })
     };
   } catch (error) {
-    console.error('Backup error:', error);
+    console.error('Backup error:', error.message, error.stack);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to create backup', details: error.message })
+      body: JSON.stringify({ error: 'Backup failed', details: error.message })
     };
   }
 };
