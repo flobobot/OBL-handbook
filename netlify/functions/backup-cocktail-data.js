@@ -1,72 +1,68 @@
 const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
+const fs = require('fs');
 
-const FILE_ID = '1BxPcwCqjrARGjGctfLuZq72xK1_9YXyL'; // Live data file
-const BACKUP_FOLDER_ID = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR'; // Frontend backup folder
+const FILE_ID = '1wnbUDegCpxasLQgOY-fpa-0ZC9WhZrJp'; // live data file
+const BACKUP_FOLDER_ID = '1qiDPIYAibg5Ao9eCwddx70DbC7mhZOwR'; // frontend-backups folder
 
 exports.handler = async function (event, context) {
   try {
-    const auth = new GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/drive'],
-    });
-    const authClient = await auth.getClient();
-    const drive = google.drive({ version: 'v3', auth: authClient });
-
-    // 1. Get original file metadata
-    const originalFile = await drive.files.get({
-      fileId: FILE_ID,
-      fields: 'name, mimeType',
-    });
-
-    // 2. Download original content
-    const fileContent = await drive.files.get(
-      { fileId: FILE_ID, alt: 'media' },
-      { responseType: 'stream' }
+    const credentials = JSON.parse(
+      Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8')
     );
 
-    // 3. Create backup filename
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupName = `cocktail_data_backup_${timestamp}.json`;
+    const auth = new GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/drive'],
+    });
 
-    // 4. Upload as new backup file
-    const backupRes = await drive.files.create({
+    const drive = google.drive({ version: 'v3', auth });
+
+    // Fetch current cocktail data file
+    const originalFile = await drive.files.get({
+      fileId: FILE_ID,
+      alt: 'media',
+    });
+
+    const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
+    const backupFilename = `backup-${timestamp}.json`;
+
+    // Upload backup
+    await drive.files.create({
       requestBody: {
-        name: backupName,
-        mimeType: originalFile.data.mimeType,
+        name: backupFilename,
+        mimeType: 'application/json',
         parents: [BACKUP_FOLDER_ID],
       },
       media: {
-        mimeType: originalFile.data.mimeType,
-        body: fileContent.data,
+        mimeType: 'application/json', // ✅ FORCE MIME HERE
+        body: Buffer.from(JSON.stringify(originalFile.data)),
       },
     });
 
-    // 5. Enforce max of 5 backups: list, sort, delete oldest
-    const list = await drive.files.list({
-      q: `'${BACKUP_FOLDER_ID}' in parents and mimeType='application/json'`,
+    // List all backups in folder
+    const listResponse = await drive.files.list({
+      q: `'${BACKUP_FOLDER_ID}' in parents and name contains 'backup-' and trashed = false`,
       fields: 'files(id, name, createdTime)',
+      orderBy: 'createdTime desc',
     });
 
-    const files = list.data.files.sort((a, b) =>
-      new Date(b.createdTime) - new Date(a.createdTime)
-    );
+    const backups = listResponse.data.files;
+    const toDelete = backups.slice(5); // keep 5 most recent
 
-    if (files.length > 5) {
-      const toDelete = files.slice(5);
-      for (let file of toDelete) {
-        await drive.files.delete({ fileId: file.id });
-      }
+    for (const file of toDelete) {
+      await drive.files.delete({ fileId: file.id });
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Backup created and old backups purged.' }),
+      body: JSON.stringify({ message: 'Backup created successfully.' }),
     };
   } catch (error) {
-    console.error('Backup error:', error);
+    console.error('Backup error:', error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Backup failed.', error: error.message }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
