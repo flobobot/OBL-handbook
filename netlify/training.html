@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OBL Training Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1c1c1c;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .module {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .module h2 {
+      margin-top: 0;
+    }
+    .admin-section {
+      background: #fff8e1;
+      padding: 1rem;
+      border-left: 4px solid #f9a825;
+      margin-top: 2rem;
+    }
+    #userLevel {
+      margin-left: 0.5rem;
+    }
+    .tag {
+      display: inline-block;
+      background: #eee;
+      color: #333;
+      padding: 0.2rem 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>OBL Training</strong></div>
+    <nav>
+      <a href="cocktail-manager.html">Cocktails</a>
+      <a href="training.html">Training</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+  <main class="container">
+    <h1>Welcome to Bartender Training</h1>
+
+    <label for="userLevelSelect">Select User Level:</label>
+    <select id="userLevelSelect" onchange="setUserLevel()">
+      <option value="1">Level 1 - Trainee</option>
+      <option value="2">Level 2 - Intermediate</option>
+      <option value="3">Level 3 - Advanced</option>
+      <option value="4">Level 4 - Supervisor</option>
+      <option value="5">Level 5 - Admin</option>
+    </select>
+
+    <div class="module">
+      <h2>🍸 Glassware</h2>
+      <p>Learn the importance of correct glassware in cocktail service.</p>
+      <span class="tag">Required</span>
+      <button onclick="startModule('glassware')">Start Module</button>
+    </div>
+
+    <div class="module">
+      <h2>🧼 Cleanliness & Hygiene</h2>
+      <p>Understand station prep, cleanliness routines, and health standards.</p>
+      <span class="tag">Required</span>
+      <button onclick="startModule('hygiene')">Start Module</button>
+    </div>
+
+    <div class="module">
+      <h2>🚨 Bartender Ground Rules</h2>
+      <p>The code of conduct, service expectations, and shift responsibilities.</p>
+      <span class="tag">Required</span>
+      <button onclick="startModule('rules')">Start Module</button>
+    </div>
+
+    <div id="adminSection" class="admin-section" style="display:none;">
+      <h3>🛠 Admin Tools</h3>
+      <p>Only visible to Level 5. Here you will manage users and review completions.</p>
+    </div>
+  </main>
+
+  <script>
+    function setUserLevel() {
+      const level = document.getElementById('userLevelSelect').value;
+      localStorage.setItem('userLevel', level);
+      checkAccess();
+    }
+
+    function checkAccess() {
+      const level = parseInt(localStorage.getItem('userLevel') || '1');
+      document.getElementById('userLevelSelect').value = level;
+      document.getElementById('adminSection').style.display = level === 5 ? 'block' : 'none';
+    }
+
+    function logout() {
+      localStorage.removeItem('userLevel');
+      location.reload();
+    }
+
+    function startModule(moduleId) {
+      alert(`Starting module: ${moduleId}`);
+      // Placeholder — this will later redirect or load module content
+    }
+
+    // Initialise
+    checkAccess();
+  </script>
+</body>
+</html>
