@@ -145,6 +145,7 @@
     const isAdmin = true;
     let currentEditIndex = null;
     let cocktails = [];
+    let displayedCocktails = [];
 
     async function fetchCocktails() {
       try {
@@ -160,6 +161,7 @@
     }
 
     function displayCocktails(cocktailsList) {
+      displayedCocktails = cocktailsList;
       const container = document.getElementById('cocktailCards');
       container.innerHTML = '';
 
@@ -270,16 +272,19 @@
       document.getElementById('downloadPdfBtn').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        let y = 10;
 
-        cocktails.forEach((c, index) => {
-          const block = `Cocktail: ${c.title}\nIngredients: ${c.ingredients?.join(', ') || '—'}\nGlassware: ${c.glassware || '—'}\nMethod: ${c.method || '—'}\nPro Tip: ${c.pro_tip || '—'}\nDid You Know: ${c.did_you_know || '—'}\nCategory: ${c.tag || 'Uncategorised'}\n`;
-          doc.text(block, 10, y);
-          y += 60;
-          if (y > 270 && index < cocktails.length - 1) {
-            doc.addPage();
-            y = 10;
-          }
+        displayedCocktails.forEach((c, index) => {
+          doc.setFontSize(14);
+          doc.text(`Cocktail: ${c.title}`, 10, 20);
+          doc.setFontSize(12);
+          doc.text(`Ingredients: ${c.ingredients?.join(', ') || '—'}`, 10, 35);
+          doc.text(`Glassware: ${c.glassware || '—'}`, 10, 45);
+          doc.text(`Method: ${c.method || '—'}`, 10, 55);
+          doc.text(`Pro Tip: ${c.pro_tip || '—'}`, 10, 65);
+          doc.text(`Did You Know: ${c.did_you_know || '—'}`, 10, 75);
+          doc.text(`Category: ${c.tag || 'Uncategorised'}`, 10, 85);
+
+          if (index < displayedCocktails.length - 1) doc.addPage();
         });
 
         doc.save('cocktail_cards.pdf');
