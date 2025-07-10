@@ -2,103 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>OBL Training – Module</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training Module</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #1c1c1c;
-      color: white;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header nav a {
-      color: white;
-      margin-left: 1rem;
-      text-decoration: none;
-    }
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    h1, h2 {
-      text-align: center;
-    }
-    .section {
-      margin-bottom: 2rem;
-    }
-    .section h3 {
-      color: #f9a825;
-    }
-    .section p {
-      line-height: 1.6;
-    }
-    .complete-btn {
-      background: #4caf50;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-      display: block;
-      margin: 2rem auto 0;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <div><strong>OBL Training</strong></div>
-    <nav>
-      <a href="training.html">Back to Training</a>
-    </nav>
-  </header>
+  <nav>
+    <a href="training.html">← Back to Training</a>
+    <span class="user-level-badge">Level: <span id="userLevel"></span></span>
+  </nav>
 
-  <main class="container">
-    <h1 id="moduleTitle">Module Title</h1>
+  <main>
+    <h1 id="moduleTitle">Loading module...</h1>
+    <div id="moduleContent"></div>
 
-    <div class="section">
-      <h3>What You'll Learn</h3>
-      <p>This module covers the core knowledge and skills for this area.</p>
+    <!-- Edit only visible for level 5 -->
+    <div id="adminTools" style="display: none; margin-top: 1em;">
+      <button onclick="editModule()">✏️ Edit Module</button>
     </div>
-
-    <div class="section">
-      <h3>Content</h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vehicula ligula at justo vehicula, a fermentum ipsum gravida.</p>
-    </div>
-
-    <div class="section">
-      <h3>Assessment</h3>
-      <p>Once you've read the material, click the button below to complete this module.</p>
-    </div>
-
-    <button class="complete-btn" onclick="completeModule()">Mark as Complete</button>
   </main>
 
+  <footer>
+    <button id="prevModule">← Previous</button>
+    <button id="nextModule">Next →</button>
+  </footer>
+
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const moduleId = urlParams.get('id');
+    // Load user level
+    const level = parseInt(localStorage.getItem("userLevel") || "1", 10);
+    document.getElementById("userLevel").textContent = level;
 
-    document.getElementById('moduleTitle').textContent = moduleId ? `Training Module: ${moduleId}` : 'Training Module';
+    // Parse module from query string
+    const params = new URLSearchParams(window.location.search);
+    const moduleId = params.get("module");
 
-    function completeModule() {
-      if (moduleId) {
-        localStorage.setItem(`completed_${moduleId}`, 'true');
-        alert(`Module '${moduleId}' marked as complete!`);
-        window.location.href = 'training.html';
-      } else {
-        alert('Module ID missing.');
-      }
+    fetch("data/training_modules.json")
+      .then(res => res.json())
+      .then(data => {
+        const mod = data.find(m => m.id === moduleId);
+        if (!mod) return document.getElementById("moduleTitle").textContent = "Module not found";
+
+        document.title = `OBL Training – ${mod.title}`;
+        document.getElementById("moduleTitle").textContent = mod.title;
+        document.getElementById("moduleContent").innerHTML = mod.content;
+
+        if (level === 5) {
+          document.getElementById("adminTools").style.display = "block";
+        }
+      });
+
+    // Admin edit action
+    function editModule() {
+      alert("Edit modal coming next! (Write access only for level 5)");
     }
   </script>
 </body>

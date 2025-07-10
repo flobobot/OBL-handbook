@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module: Glassware</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fdfdfd;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #1c1c1c;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .content {
+      line-height: 1.6;
+    }
+    .quiz {
+      margin-top: 2rem;
+      border-top: 1px solid #ddd;
+      padding-top: 1.5rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #f9a825;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>OBL Training</strong></div>
+    <nav>
+      <a href="training.html">Back to Modules</a>
+    </nav>
+  </header>
+  <main class="container">
+    <h1>Glassware Module</h1>
+    <div class="content">
+      <p>Each cocktail requires its correct glassware to enhance presentation and experience. This module covers standard glasses used at OBL including:</p>
+      <ul>
+        <li>Rocks Glass</li>
+        <li>Highball</li>
+        <li>Nick & Nora</li>
+        <li>Coupette</li>
+        <li>Collins</li>
+        <li>Wine and Fizz</li>
+      </ul>
+    </div>
+
+    <div class="quiz">
+      <p><strong>Quiz:</strong> Which glass would you use for an Old Fashioned?</p>
+      <button onclick="submitAnswer()">Rocks Glass</button>
+    </div>
+  </main>
+
+  <script>
+    function submitAnswer() {
+      alert("Correct! Progress saved.");
+      localStorage.setItem('module_glassware_complete', 'true');
+      window.location.href = 'training.html';
+    }
+  </script>
+</body>
+</html>
