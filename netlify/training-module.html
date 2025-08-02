@@ -1,51 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OBL Training – Module</title>
+  <title>Training Module</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <nav>
     <a href="training.html">← Back to Training</a>
-    <span class="user-level-badge">Level: <span id="userLevel"></span></span>
+    <span>User Level: <span id="userLevel"></span></span>
   </nav>
 
   <main>
-    <h1 id="moduleTitle">Loading module...</h1>
+    <h1 id="moduleTitle">Loading...</h1>
     <div id="moduleContent"></div>
-
-    <!-- Edit only visible for level 5 -->
-    <div id="adminTools" style="display: none; margin-top: 1em;">
+    <div id="adminTools" style="display:none;">
       <button onclick="editModule()">✏️ Edit Module</button>
     </div>
   </main>
 
-  <footer>
-    <button id="prevModule">← Previous</button>
-    <button id="nextModule">Next →</button>
-  </footer>
-
-  <!-- Edit Modal -->
-  <div id="editModal" style="display: none; position: fixed; top: 10%; left: 10%; width: 80%; background: white; border: 2px solid black; padding: 1em; z-index: 1000;">
-    <h2>Edit Module: <span id="editModuleTitle"></span></h2>
-    <label>Title:</label><br>
-    <input type="text" id="editTitle" style="width: 100%;" /><br><br>
-
-    <label>HTML Content:</label><br>
-    <textarea id="editContent" style="width: 100%; height: 200px;"></textarea><br><br>
-
-    <button onclick="saveModuleEdits()">💾 Save</button>
-    <button onclick="closeEditModal()">Cancel</button>
-  </div>
-
   <script>
-    // Load user level
     const level = parseInt(localStorage.getItem("userLevel") || "1", 10);
     document.getElementById("userLevel").textContent = level;
 
-    // Parse module from query string
     const params = new URLSearchParams(window.location.search);
     const moduleId = params.get("module");
     let currentModule = null;
@@ -54,14 +33,10 @@
       .then(res => res.json())
       .then(data => {
         const mod = data.find(m => m.id === moduleId);
-        if (!mod) {
-          document.getElementById("moduleTitle").textContent = "Module not found";
-          return;
-        }
+        if (!mod) return document.getElementById("moduleTitle").textContent = "Module not found";
 
         currentModule = mod;
-
-        document.title = `OBL Training – ${mod.title}`;
+        document.title = `Training – ${mod.title}`;
         document.getElementById("moduleTitle").textContent = mod.title;
         document.getElementById("moduleContent").innerHTML = mod.content;
 
@@ -70,51 +45,8 @@
         }
       });
 
-    // Open edit modal
     function editModule() {
-      if (!currentModule) return;
-
-      document.getElementById("editModuleTitle").textContent = currentModule.title;
-      document.getElementById("editTitle").value = currentModule.title;
-      document.getElementById("editContent").value = currentModule.content;
-
-      document.getElementById("editModal").style.display = "block";
-    }
-
-    // Close modal
-    function closeEditModal() {
-      document.getElementById("editModal").style.display = "none";
-    }
-
-    // Save to Drive via Netlify function
-    function saveModuleEdits() {
-      const updated = {
-        id: currentModule.id,
-        title: document.getElementById("editTitle").value,
-        content: document.getElementById("editContent").value,
-        level: currentModule.level
-      };
-
-      fetch("data/training_modules.json")
-        .then(res => res.json())
-        .then(allModules => {
-          const index = allModules.findIndex(m => m.id === updated.id);
-          if (index !== -1) {
-            allModules[index] = updated;
-
-            fetch("/.netlify/functions/saveTrainingModules", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(allModules)
-            })
-              .then(res => res.json())
-              .then(resp => {
-                alert("Module saved!");
-                location.reload();
-              })
-              .catch(err => alert("Save failed."));
-          }
-        });
+      alert("Edit modal not yet wired in this minimal version.");
     }
   </script>
 </body>
