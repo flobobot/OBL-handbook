@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OBL Training</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBL Bartender Training</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,19 +19,20 @@
     </div>
   </nav>
 
-  <div class="container">
+  <div class="main-container">
     <h1>Welcome to Bartender Training</h1>
-    <label>Select User Level:
-      <select id="userLevelSelect">
-        <option value="1">Level 1 – Trainee</option>
-        <option value="2">Level 2 – Junior</option>
-        <option value="3">Level 3 – Staff</option>
-        <option value="4">Level 4 – Supervisor</option>
-        <option value="5">Level 5 – Admin</option>
-      </select>
-    </label>
-
-    <div id="moduleList" class="module-list"></div>
+    <div class="level-select">
+      <label>Select User Level:
+        <select id="userLevelSelect">
+          <option value="1">Level 1 – Trainee</option>
+          <option value="2">Level 2 – Junior</option>
+          <option value="3">Level 3 – Staff</option>
+          <option value="4">Level 4 – Supervisor</option>
+          <option value="5">Level 5 – Admin</option>
+        </select>
+      </label>
+    </div>
+    <div id="moduleList" class="card-grid"></div>
   </div>
 
   <script>
@@ -54,7 +55,11 @@
             card.className = "card";
             card.innerHTML = `
               <h2>${mod.title}</h2>
-              <p><a href="training-module.html?module=${mod.id}" class="button">Start Module</a></p>
+              <p class="module-summary">${mod.summary || "No summary provided."}</p>
+              <div class="card-footer">
+                <span class="tag">Required</span>
+                <a class="button" href="training-module.html?module=${mod.id}">Start Module</a>
+              </div>
             `;
             moduleList.appendChild(card);
           }

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Training Module</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -17,12 +17,13 @@
     </div>
   </nav>
 
-  <div class="container">
-    <h1 id="moduleTitle">Loading...</h1>
-    <div id="moduleContent" class="module-content"></div>
-
-    <div id="adminTools" style="display:none; margin-top: 1rem;">
-      <button onclick="editModule()">✏️ Edit Module</button>
+  <div class="main-container">
+    <div class="card">
+      <h1 id="moduleTitle">Loading...</h1>
+      <div id="moduleContent" class="module-content"></div>
+      <div id="adminTools" style="display:none; margin-top: 1rem;">
+        <button onclick="editModule()">✏️ Edit Module</button>
+      </div>
     </div>
   </div>
 
@@ -51,7 +52,7 @@
       });
 
     function editModule() {
-      alert("Edit modal coming soon.");
+      alert("Edit modal not yet wired.");
     }
   </script>
 </body>
