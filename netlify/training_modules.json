@@ -1,93 +1,80 @@
 [
   {
-    "id": "role",
+    "id": "working",
     "title": "Working as a Bartender",
-    "level": 1,
-    "summary": "Learn the mindset and expectations of a professional bartender.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Expectations and responsibilities of a bartender in a fast-paced environment.",
+    "content": "<p>Your job isn't just pouring drinks. It\u2019s about flow, sharp timing, and reading the room. The guest sees confidence and control before they even taste the product. You\u2019re expected to work clean, smart, and fast; know your drinks; handle glassware properly; and keep the bar tight.</p>"
   },
   {
-    "id": "responsibility",
+    "id": "responsible",
     "title": "Responsible Bartending",
-    "level": 1,
-    "summary": "Understand responsible service and managing alcohol safely.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Understanding alcohol laws, safe service, and being a responsible host.",
+    "content": "<p>Know when and how to refuse service. Be aware of alcohol strength, guest behaviour, and legal limits. Monitor intoxication levels, and intervene early. A responsible bartender protects the venue, the guest, and the team.</p>"
   },
   {
-    "id": "legal",
+    "id": "alcohol-id",
     "title": "Alcohol, ID, and Measures",
-    "level": 1,
-    "summary": "Learn the legal requirements for alcohol service and ID checks.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Alcohol laws, checking ID, and standardised pouring practices.",
+    "content": "<p>Learn the correct ID procedures. Understand standard measures and how to pour accurately. Ensure every drink is legal, consistent, and up to house standards. Never serve underage or intoxicated guests.</p>"
   },
   {
-    "id": "presence",
+    "id": "guest-memory",
     "title": "Guest Interaction & Memory",
-    "level": 2,
-    "summary": "Master body language, awareness, and guest interaction.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Memorable service starts with strong guest recognition and clear communication.",
+    "content": "<p>Use guest names when possible, remember orders, and acknowledge returning guests. Repetition, verbal confirmation, and structured routines boost memory and trust.</p>"
   },
   {
-    "id": "standards",
+    "id": "shift-standards",
     "title": "Shift Standards",
-    "level": 2,
-    "summary": "Set up your section and execute clean, consistent service.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Opening, mid-shift, and closing routines to keep operations tight.",
+    "content": "<p>Always show up 15 minutes early. Pre-shift tasks include glass polish, ice levels, and bar prep. Post-shift means clean-down, fridges, till-out, and team handovers. Don\u2019t leave mess for the next shift.</p>"
   },
   {
-    "id": "cleaning",
+    "id": "hygiene-setup",
     "title": "Hygiene & Setup",
-    "level": 1,
-    "summary": "Maintain hygiene, prep correctly, and clean like a pro.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Station prep, cleanliness routines, and health standards.",
+    "content": "<p>Surfaces must be sanitised before every shift. Ice scoops, fruit, and tools must be hygienic. No drinks without a clean station. Learn colour-coded cloth systems and weekly deep-clean routines.</p>"
   },
   {
-    "id": "tools",
+    "id": "tools-glassware",
     "title": "Tools & Glassware",
-    "level": 1,
-    "summary": "Get to know the essential tools and glassware for every shift.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Learn the essential tools and how to use glassware correctly.",
+    "content": "<p>Know your tins, strainers, jiggers, and stirring tools. Glassware must be handled by the stem or base only. No hands inside. Learn to identify and polish coupe, highball, rocks, Nick & Nora, and wine glasses.</p>"
   },
   {
-    "id": "method",
+    "id": "method-technique",
     "title": "Method & Technique",
-    "level": 2,
-    "summary": "Understand shake vs stir, build, throw and more.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Master the basics: build, shake, stir, strain, and layer.",
+    "content": "<p>Each method has a purpose: shaking for aeration, stirring for clarity, building for simplicity. Learn when to fine strain and when to double shake. Practice clean, elegant technique with zero spillage.</p>"
   },
   {
-    "id": "rounds",
+    "id": "roundbuilding",
     "title": "Roundbuilding & Service Flow",
-    "level": 2,
-    "summary": "Learn how to build rounds efficiently and manage orders fast.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "summary": "Building rounds efficiently and managing service under pressure.",
+    "content": "<p>Start with long drinks, finish with shaken ones. Build rounds from easiest to hardest. Communicate clearly, check dockets fast, and delegate where needed. Efficiency is teamwork plus anticipation.</p>"
   },
   {
-    "id": "cocktails",
-    "title": "Core Cocktails to Know",
-    "level": 3,
-    "summary": "Memorise the core classic cocktails and their specs.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "id": "bar-prep",
+    "title": "Bar Prep & Rota Systems",
+    "summary": "Understanding prep lists, rotation systems, and stock duties.",
+    "content": "<p>Each shift has designated prep: syrups, juices, garnishes, batching. Know your duties. Rota systems should be followed precisely. Label, rotate, and manage waste properly. Restock before the next shift, not after.</p>"
   },
   {
-    "id": "knowledge",
-    "title": "Product Knowledge Basics",
-    "level": 3,
-    "summary": "Learn essential product knowledge and bartender lingo.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "id": "specs",
+    "title": "Cocktail Specs & Batching",
+    "summary": "How we learn and follow cocktail specs in service.",
+    "content": "<p>Every cocktail has a reason and a ratio. Specs must be memorised and followed unless otherwise instructed. Use jiggers, taste test when appropriate, and record new drinks into the spec book or digital system.</p>"
   },
   {
-    "id": "spirits",
-    "title": "Spirits & Origins",
-    "level": 3,
-    "summary": "Understand spirit types and their regions of origin.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "id": "zero-abv",
+    "title": "Zero ABV & Inclusive Service",
+    "summary": "Serving guests who don\u2019t drink alcohol with the same quality and flair.",
+    "content": "<p>Zero-alcohol drinks are not an afterthought. Learn the zero-ABV menu, use proper garnishes, and ensure consistent presentation. Offer tastings, upsell creatively, and avoid judgmental language.</p>"
   },
   {
-    "id": "stock",
-    "title": "Stock, Waste, Complaints",
-    "level": 2,
-    "summary": "Learn stock control, wastage handling and complaint protocol.",
-    "content": "<p>Content for this module coming soon.</p>"
+    "id": "site-specific",
+    "title": "Site-Specific Rules",
+    "summary": "Rules and expectations specific to this venue.",
+    "content": "<p>Coming soon. This section will be filled in by the general manager and training lead to reflect venue-specific policies, procedures, and security protocols.</p>"
   }
 ]
