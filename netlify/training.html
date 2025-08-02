@@ -3,12 +3,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bartender Training</title>
+  <title>OBL Training</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <strong>OBL Training</strong>
+    </div>
+    <div class="navbar-right">
+      <a href="cocktail-manager.html">Cocktails</a>
+      <a href="training.html">Training</a>
+      <a href="#">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
     <h1>Welcome to Bartender Training</h1>
     <label>Select User Level:
       <select id="userLevelSelect">
@@ -19,8 +30,10 @@
         <option value="5">Level 5 – Admin</option>
       </select>
     </label>
-  </nav>
-  <main id="moduleList"></main>
+
+    <div id="moduleList" class="module-list"></div>
+  </div>
+
   <script>
     const levelSelect = document.getElementById("userLevelSelect");
     const moduleList = document.getElementById("moduleList");
@@ -37,12 +50,13 @@
         const userLevel = parseInt(localStorage.getItem("userLevel") || "1");
         data.forEach(mod => {
           if (userLevel >= mod.level) {
-            const el = document.createElement("div");
-            el.innerHTML = `
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
               <h2>${mod.title}</h2>
-              <p><a href="training-module.html?module=${mod.id}">Start Module</a></p>
+              <p><a href="training-module.html?module=${mod.id}" class="button">Start Module</a></p>
             `;
-            moduleList.appendChild(el);
+            moduleList.appendChild(card);
           }
         });
       });
